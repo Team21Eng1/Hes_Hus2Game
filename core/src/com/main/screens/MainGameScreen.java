@@ -1,10 +1,11 @@
 package com.main.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -15,9 +16,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
 import com.main.map.GameMap;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The MainGameScreen class is responsible for rendering and updating all the game elements
@@ -55,6 +58,8 @@ public class MainGameScreen implements Screen, InputProcessor {
     private int energyCounter, duration, dayNum, recActivity, studyHours, mealCount, currentHour;
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
+
+    private List<String> activities = new ArrayList<>();
 
     /**
      * Constructs the main game screen with necessary game components.
@@ -422,6 +427,7 @@ public class MainGameScreen implements Screen, InputProcessor {
             if (dayNum == 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
             resetDay();
         }
+        if (dayNum > 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
     }
 
     /**
@@ -565,6 +571,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     break;
@@ -575,6 +582,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
@@ -585,6 +593,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         if (energyCounter > 10) energyCounter = 10;
                         energyBar.dispose();
                         energyBar = setEnergyBar();
+                        activities.add("eat");
                     }
                     break;
 
@@ -595,6 +604,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "exercise";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
 
@@ -605,6 +615,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "sleep";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
             }
