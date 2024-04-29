@@ -123,22 +123,22 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
         if (touchX >= x && touchX <= x + playButtonWidth &&
                 touchY >= playButtonY && touchY <= playButtonY + playButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.GAME_SCREEN);
         }
         else if (touchX >= x && touchX <= x + controlsButtonWidth &&
                 touchY >= controlsButtonY && touchY <= controlsButtonY + controlsButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.CONTROLS);
         }
         else if (touchX >= x && touchX <= x + settingsButtonWidth &&
                 touchY >= settingsButtonY && touchY <= settingsButtonY + settingsButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.SETTINGS);
         }
         else if (touchX >= x && touchX <= x + exitButtonWidth &&
                 touchY >= exitButtonY && touchY <= exitButtonY + exitButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.clearMemory();
             exitFlag = true;
             dispose();

@@ -475,25 +475,25 @@ public class MainGameScreen implements Screen, InputProcessor {
         touchY = game.screenHeight - touchY;
 
         if (touchX >= menuButtonX && touchX <= menuButtonX + menuButtonWidth && touchY >= menuButtonY && touchY <= menuButtonY + menuButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
         }
         else if (showMenu){
             switch (activity){
                 case "study":
                     if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration < 4) duration++;
                     } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration > 1) duration--;
                     } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = false;
                         lockMovement = fadeOut;
                         duration = 1;
                     } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = false;
                         lockMovement = fadeOut;
                         studyHours += duration;
@@ -507,18 +507,18 @@ public class MainGameScreen implements Screen, InputProcessor {
 
                 case "exercise":
                     if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration < 4) duration++;
                     } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration > 1) duration--;
                     } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = false;
                         lockMovement = fadeOut;
                         duration = 1;
                     } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (energyCounter >= duration) {
                             executeFadeOut(false);
                             showMenu = false;
@@ -535,18 +535,18 @@ public class MainGameScreen implements Screen, InputProcessor {
 
                 case "sleep":
                     if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration < 10) duration++;
                     } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         if (duration > 1) duration--;
                     } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = false;
                         lockMovement = fadeOut;
                         duration = 1;
                     } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = false;
                         lockMovement = fadeOut;
                         resetDay();
@@ -561,7 +561,7 @@ public class MainGameScreen implements Screen, InputProcessor {
             switch (popupMenuType) {
                 case "Comp_sci_door":
                     if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
@@ -571,15 +571,15 @@ public class MainGameScreen implements Screen, InputProcessor {
 
                 case "Piazza_door":
                     if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
                         duration = 1;
                     }
                     else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
-                        game.gameData.buttonClickedSoundActivate();
-                        game.gameData.eatingSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
+                        game.audio.eatingSoundActivate();
                         energyCounter += 3;
                         mealCount++;
                         if (energyCounter > 10) energyCounter = 10;
@@ -590,7 +590,7 @@ public class MainGameScreen implements Screen, InputProcessor {
 
                 case "Gym_door":
                     if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = true;
                         lockMovement = true;
                         activity = "exercise";
@@ -600,7 +600,7 @@ public class MainGameScreen implements Screen, InputProcessor {
 
                 case "Goodricke_door":
                     if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.gameData.buttonClickedSoundActivate();
+                        game.audio.buttonClickedSoundActivate();
                         showMenu = true;
                         lockMovement = true;
                         activity = "sleep";
