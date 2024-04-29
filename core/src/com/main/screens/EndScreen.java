@@ -77,12 +77,12 @@ public class EndScreen implements Screen, InputProcessor {
         touchY = game.screenHeight - touchY;
         if (touchX >= buttonX && touchX <= buttonX + buttonWidth &&
                 touchY >= playAgainButtonY && touchY <= playAgainButtonY + buttonHeight) {
-            game.gSound.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.setup();
         }
         else if (touchX >= buttonX && touchX <= buttonX + buttonWidth &&
                 touchY >= exitButtonY && touchY <= exitButtonY + buttonHeight) {
-            game.gSound.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.clearMemory();
             exitFlag = true;
             dispose();
