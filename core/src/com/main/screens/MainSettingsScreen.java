@@ -35,18 +35,18 @@ public class MainSettingsScreen implements Screen, InputProcessor {
      */
     public MainSettingsScreen(Main game) {
         this.game = game;
-        gender = game.gameData.getGender();
+        gender = true;//game.gameData.getGender();
 
         backButton = new Texture("settings_gui/back_button.png");
         settingsLabel = new Texture("settings_gui/settings_label.png");
         musicUpButton = new Texture("settings_gui/arrow_right_button.png");
         musicDownButton = new Texture("settings_gui/arrow_left_button.png");
         musicLabel = new Texture("settings_gui/music_label.png");
-        musicBar = new Texture("settings_gui/bar_" + 25 * game.gameData.getMusicLevel() +".png");
+        musicBar = new Texture("settings_gui/bar_" + 25 * game.audio.getMusicLevel() +".png");
         soundUpButton = new Texture("settings_gui/arrow_right_button.png");
         soundLabel = new Texture("settings_gui/sound_label.png");
         soundDownButton = new Texture("settings_gui/arrow_left_button.png");
-        soundBar = new Texture("settings_gui/bar_" + 25 * game.gameData.getSoundLevel() +".png");
+        soundBar = new Texture("settings_gui/bar_" + 25 * game.audio.getSoundLevel() +".png");
         if (gender) {
             boyButton = new Texture("settings_gui/boy_button_indented.png");
             girlButton = new Texture("settings_gui/girl_button.png");
@@ -168,47 +168,47 @@ public class MainSettingsScreen implements Screen, InputProcessor {
 
         if (worldX >= backButtonX && worldX <= backButtonX + backButtonWidth &&
                 worldY >= backButtonY && worldY <= backButtonY + backButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
         } else if (worldX >= musicUpButtonX && worldX <= musicUpButtonX + musicUpButtonWidth &&
                 worldY >= musicUpButtonY && worldY <= musicUpButtonY + musicUpButtonHeight) {
-            if (game.gameData.getMusicLevel() <= 3){
-                game.gameData.incrementMusicLevel();
-                game.gameData.upSoundActivate();
+            if (game.audio.getMusicLevel() <= 3){
+                game.audio.musicVolUp();
+                game.audio.upSoundActivate();
                 if (musicBar!=null) musicBar.dispose();
-                musicBar = new Texture("settings_gui/bar_" + 25 * game.gameData.getMusicLevel() +".png");
+                musicBar = new Texture("settings_gui/bar_" + 25 * game.audio.getMusicLevel() +".png");
             }
         } else if (worldX >= musicDownButtonX && worldX <= musicDownButtonX + musicDownButtonWidth &&
                 worldY >= musicDownButtonY && worldY <= musicDownButtonY + musicDownButtonHeight){
 
-            if (game.gameData.getMusicLevel() >= 1){
-                game.gameData.decrementMusicLevel();
-                game.gameData.downSoundActivate();
+            if (game.audio.getMusicLevel() >= 1){
+                game.audio.musicVolDown();
+                game.audio.downSoundActivate();
                 if (musicBar!=null) musicBar.dispose();
-                musicBar = new Texture("settings_gui/bar_" + 25 * game.gameData.getMusicLevel() +".png");
+                musicBar = new Texture("settings_gui/bar_" + 25 * game.audio.getMusicLevel() +".png");
             }
         } else if (worldX >= soundUpButtonX && worldX <= soundUpButtonX + soundUpButtonWidth &&
                 worldY >= soundUpButtonY && worldY <= soundUpButtonY + soundUpButtonHeight) {
 
-            if (game.gameData.getSoundLevel() <= 3){
-                game.gameData.incrementSoundLevel();
-                game.gameData.upSoundActivate();
+            if (game.audio.getSoundLevel() <= 3){
+                game.audio.soundVolUp();
+                game.audio.upSoundActivate();
                 if (soundBar!=null) soundBar.dispose();
-                soundBar = new Texture("settings_gui/bar_" + 25 * game.gameData.getSoundLevel() +".png");
+                soundBar = new Texture("settings_gui/bar_" + 25 * game.audio.getSoundLevel() +".png");
             }
         } else if (worldX >= soundDownButtonX && worldX <= soundDownButtonX + soundDownButtonWidth &&
                 worldY >= soundDownButtonY && worldY <= soundDownButtonY + soundDownButtonHeight){
 
-            if (game.gameData.getSoundLevel() >= 1){
-                game.gameData.decrementSoundLevel();
-                game.gameData.downSoundActivate();
+            if (game.audio.getSoundLevel() >= 1){
+                game.audio.soundVolDown();
+                game.audio.downSoundActivate();
                 if (soundBar!=null) soundBar.dispose();
-                soundBar = new Texture("settings_gui/bar_" + 25 *game.gameData.getSoundLevel()+".png");
+                soundBar = new Texture("settings_gui/bar_" + 25 *game.audio.getSoundLevel()+".png");
             }
         } else if (worldX >= boyButtonX && worldX <= boyButtonX + boyButtonWidth &&
                 worldY >= boyButtonY && worldY <= boyButtonY + boyButtonHeight){
             gender = true;
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             if (boyButton!=null) boyButton.dispose();
             if (girlButton!=null) girlButton.dispose();
             boyButton = new Texture("settings_gui/boy_button_indented.png");
@@ -216,14 +216,14 @@ public class MainSettingsScreen implements Screen, InputProcessor {
         } else if (worldX >= girlButtonX && worldX <= girlButtonX + girlButtonWidth &&
                 worldY >= girlButtonY && worldY <= girlButtonY + girlButtonHeight){
             gender = false;
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             if (boyButton!=null) boyButton.dispose();
             if (girlButton!=null) girlButton.dispose();
             girlButton = new Texture("settings_gui/girl_button_indented.png");
             boyButton = new Texture("settings_gui/boy_button.png");
         }
 
-        game.gameData.setGender(gender);
+        //game.setGender(gender);
 
         return true;
     }

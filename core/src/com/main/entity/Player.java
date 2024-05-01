@@ -13,6 +13,8 @@ import com.main.map.GameMap;
 import com.main.Main;
 import com.main.utils.CollisionHandler;
 
+import java.util.ArrayList;
+
 /**
  * The Player class represents the character in the game, handling movement, collision,
  * and animations.
@@ -24,9 +26,9 @@ public class Player extends Entity implements Disposable {
     CollisionHandler collisionHandler;
 
     char dir; // Current direction of the player
-    public static final float animation_speed = 0.5f; // speed that sprite will animate or frame duration
-    public static final int spriteX = 24;// this is in reference to the sprite sheet
-    public static final int spriteY = 38;
+    public static final float animation_speed = 0.12f; // speed that sprite will animate or frame duration
+    public static final int spriteX = 15;// this is in reference to the sprite sheet
+    public static final int spriteY = 23;
     int tileSize;
 
     public float startX, startY;
@@ -71,7 +73,7 @@ public class Player extends Entity implements Disposable {
      */
     public void update(float delta) {
         boolean isMoving = false;
-
+        currentAnimation.setFrameDuration(animation_speed);
         // Determine if the player is moving diagonally
         boolean isMovingDiagonally = ((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) ||
                 (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S))) &&
@@ -84,7 +86,8 @@ public class Player extends Entity implements Disposable {
         }
         // shift key doubles player speed
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
-            normalizedSpeed *= 2; // Increase speed if shift is pressed
+            normalizedSpeed *= 1.5;
+            currentAnimation.setFrameDuration(0.08f);// Increase speed if shift is pressed
         }
 
         float targX = worldX;
@@ -189,29 +192,46 @@ public class Player extends Entity implements Disposable {
     public void updateGender(){
         if (idleSheet != null) {idleSheet.dispose();}
         if (walkSheet != null) {walkSheet.dispose();}
-        if (game.gameData.getGender()) {
-            idleSheet = new Texture("character/boy_idle.png");
-            walkSheet = new Texture("character/boy_walk.png");
-        } else {
-            idleSheet = new Texture("character/girl_idle.png");
-            walkSheet = new Texture("character/girl_walk.png");
-        }
+//        if (game.gameData.getGender()) {
+//            idleSheet = new Texture("character/boy_idle.png");
+//            walkSheet = new Texture("character/boy_walk.png");
+//        } else {
+//            idleSheet = new Texture("character/girl_idle.png");
+//            walkSheet = new Texture("character/girl_walk.png");
+//        }
+        Texture pSheet = new Texture("character/player.png");
+        //TextureRegion[][] idleSpriteSheet = TextureRegion.split(idleSheet, spriteX, spriteY); // Splits the sprite sheet up by its frames
+        //TextureRegion[][] walkSpriteSheet = TextureRegion.split(walkSheet, spriteX, spriteY); // Splits the sprite sheet up by its frames
 
-        TextureRegion[][] idleSpriteSheet = TextureRegion.split(idleSheet, spriteX, spriteY); // Splits the sprite sheet up by its frames
-        TextureRegion[][] walkSpriteSheet = TextureRegion.split(walkSheet, spriteX, spriteY); // Splits the sprite sheet up by its frames
+        walkDownAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,3,15,23,33,25,17,20,false)); // First row for down
+        walkLeftAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,4,15,23,33,25,17,20,true)); // Second row for left
+        walkRightAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,4,15,23,33,25,17,20,false)); // Third row for right
+        walkUpAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,5,15,23,33,25,17,20,false)); // Fourth row for up
 
-        walkDownAnimation = new Animation<>(animation_speed, walkSpriteSheet[0]); // First row for down
-        walkLeftAnimation = new Animation<>(animation_speed, walkSpriteSheet[1]); // Second row for left
-        walkRightAnimation = new Animation<>(animation_speed, walkSpriteSheet[2]); // Third row for right
-        walkUpAnimation = new Animation<>(animation_speed, walkSpriteSheet[3]); // Fourth row for up
-
-        idleDownAnimation = new Animation<>(animation_speed, idleSpriteSheet[0][0], idleSpriteSheet[0][1]);
-        idleLeftAnimation = new Animation<>(animation_speed, idleSpriteSheet[1][0], idleSpriteSheet[1][1]);
-        idleRightAnimation = new Animation<>(animation_speed, idleSpriteSheet[2][0], idleSpriteSheet[2][1]);
-        idleUpAnimation = new Animation<>(animation_speed, idleSpriteSheet[3][0], idleSpriteSheet[3][1]);
+        idleDownAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,0,15,23,33,25,17,20,false));
+        idleLeftAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,1,15,23,33,25,17,20,true));
+        idleRightAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,1,15,23,33,25,17,20,false));
+        idleUpAnimation = new Animation<>(animation_speed, getFrames(pSheet,0,5,2,15,23,33,25,17,20,false));
 
         setDirection(dir);
     }
+    public TextureRegion[] getFrames(Texture sprSheet, int start, int end, int row, int width, int height, int gutX, int gutY,int marX, int marY,boolean flip)
+    {
+        int x = 0;
+        int y = 0;
+
+        ArrayList<TextureRegion> temp = new ArrayList<TextureRegion>();
+        for (int i = 0; i < end-start+1; i++) {
+            x = marX + i*(width+gutX);
+            y = marY + row*(height+gutY);
+            TextureRegion hi = new TextureRegion(sprSheet,x,y,width,height);
+            hi.flip(flip, false);
+            temp.add(hi);
+        }
+        TextureRegion[] hi = temp.toArray(new TextureRegion[0]);
+        return hi;
+    }
+
 
     public void setDirection(char dir){
         this.dir = dir;
