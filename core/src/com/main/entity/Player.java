@@ -72,6 +72,8 @@ public class Player extends Entity implements Disposable {
      * @param delta Time since last frame in seconds.
      */
     public void update(float delta) {
+
+
         boolean isMoving = false;
         currentAnimation.setFrameDuration(animation_speed);
         // Determine if the player is moving diagonally
@@ -215,22 +217,7 @@ public class Player extends Entity implements Disposable {
 
         setDirection(dir);
     }
-    public TextureRegion[] getFrames(Texture sprSheet, int start, int end, int row, int width, int height, int gutX, int gutY,int marX, int marY,boolean flip)
-    {
-        int x = 0;
-        int y = 0;
 
-        ArrayList<TextureRegion> temp = new ArrayList<TextureRegion>();
-        for (int i = 0; i < end-start+1; i++) {
-            x = marX + i*(width+gutX);
-            y = marY + row*(height+gutY);
-            TextureRegion hi = new TextureRegion(sprSheet,x,y,width,height);
-            hi.flip(flip, false);
-            temp.add(hi);
-        }
-        TextureRegion[] hi = temp.toArray(new TextureRegion[0]);
-        return hi;
-    }
 
 
     public void setDirection(char dir){
@@ -256,9 +243,7 @@ public class Player extends Entity implements Disposable {
      *
      * @return The current TextureRegion of the player's animation.
      */
-    public TextureRegion getCurrentFrame() {
-        return currentAnimation.getKeyFrame(stateTime, true);
-    }
+
 
     public CollisionHandler getCollisionHandler(){
         return collisionHandler;

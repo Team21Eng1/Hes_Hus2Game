@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
+import com.main.entity.Student;
 import com.main.map.GameMap;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.main.utils.CollisionHandler;
@@ -56,6 +57,9 @@ public class MainGameScreen implements Screen, InputProcessor {
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
 
+
+    private Student student;
+
     /**
      * Constructs the main game screen with necessary game components.
      * Initializes game map, player, camera, UI elements, and sets the initial game state.
@@ -96,6 +100,9 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.camera = new OrthographicCamera();
         this.gameMap = new GameMap(this.camera);
         this.player = new Player(this.game, this.gameMap, this.camera);
+
+        this.student = new Student(this.game, this.gameMap);
+
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.popupFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.durationFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -384,12 +391,25 @@ public class MainGameScreen implements Screen, InputProcessor {
         gameMap.render();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
+        updateEntities(delta);
+        drawEntities();
+
         if (!lockPopup) drawPopUpMenu();
         game.batch.end();
         if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
         fadeOutStep(delta);
     }
+
+    private void drawEntities()
+    {
+        game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
+        game.batch.draw(student.getCurrentFrame(),student.worldX,student.worldY,Student.spriteX,Student.spriteY);
+    }
+    private void updateEntities(float delta)
+    {
+        student.update(delta);
+    }
+
 
     /**
      * Renders the UI elements of the game.
