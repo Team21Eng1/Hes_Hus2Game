@@ -9,5 +9,6 @@ public enum ScreenType {
     SETTINGS,
     CONTROLS,
     MINI_GAME,
-    END_SCREEN
+    END_SCREEN,
+    LEADERBOARD
 }
