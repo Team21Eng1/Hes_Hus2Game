@@ -12,12 +12,14 @@ import com.main.Main;
 import com.main.utils.ScreenType;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class LeaderboardScreen implements Screen, InputProcessor {
     Main game;
     BitmapFont font, titleFont;
-    List<String> highScores;
+    List<String[]> highScores;  // List to hold score entries as arrays
     private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
     private float titleY;
@@ -39,12 +41,20 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         FileHandle file = Gdx.files.local("leaderboard.csv");
         if (file.exists()) {
             String[] scoreEntries = file.readString().split("\\r?\\n");
-            for (int i = 1; i < scoreEntries.length; i++) { // Start from index 1 to skip the header
-                String entry = scoreEntries[i];
-                if (entry != null && !entry.isEmpty()) {
-                    highScores.add(entry.trim()); // Trim to remove any unwanted spaces
+            for (int i = 1; i < scoreEntries.length; i++) { // Skip the header
+                String[] parts = scoreEntries[i].split(",");
+                if (parts.length == 2) {
+                    highScores.add(new String[] { parts[0].trim(), parts[1].trim() });
                 }
             }
+            // Sort the scores in descending order and take the top 10
+            Collections.sort(highScores, new Comparator<String[]>() {
+                @Override
+                public int compare(String[] o1, String[] o2) {
+                    return Integer.compare(Integer.parseInt(o2[1]), Integer.parseInt(o1[1]));
+                }
+            });
+            highScores = highScores.size() > 10 ? highScores.subList(0, 10) : highScores; // Limit to top 10 scores
         }
     }
 
@@ -72,9 +82,9 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         game.batch.begin();
         titleFont.draw(game.batch, "Leaderboard", 0, titleY, game.screenWidth, Align.center, false);
         float y = titleY - 200; // Adjust starting position for scores to accommodate the title
-        for (String score : highScores) {
-            String formattedScore = formatScoreEntry(score);
-            font.draw(game.batch, formattedScore, 0, y, game.screenWidth, Align.center, false);
+        for (String[] scoreEntry : highScores) {
+            String displayText = scoreEntry[0] + ": " + scoreEntry[1];
+            font.draw(game.batch, displayText, 0, y, game.screenWidth, Align.center, false);
             y -= font.getLineHeight(); // Move to the next line
         }
         game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
