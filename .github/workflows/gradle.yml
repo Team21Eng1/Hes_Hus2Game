@@ -46,6 +46,6 @@ jobs:
       uses: actions/upload-artifact@v4.3.3
       with:
         name: Build File
-        path: core/build/libs/core-1.0.jar
+        path: desktop/build/libs/desktop-1.0.jar
       
  
