@@ -18,7 +18,7 @@ import com.main.utils.ScreenType;
  * It initializes and manages the game's resources, screens, and settings.
  */
 public class Main extends Game {
-	public SpriteBatch batch; // Used for drawing textures and sprites in batches
+	public SpriteBatch batch; // Used for drawing textures and sprites in batchesw
 	public AudioManager audio;
 	public ScreenManager screenManager; // Manages the game's screens, allowing for easy transitions
 	public int screenWidth, screenHeight; // The current width and height of the screen

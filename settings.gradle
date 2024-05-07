@@ -1,1 +1,4 @@
 include 'core', 'desktop'
+include 'Test'
+include 'Test'
+

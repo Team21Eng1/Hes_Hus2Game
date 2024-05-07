@@ -5,11 +5,8 @@ import com.badlogic.gdx.audio.Music;
 
 public class AudioManager {
 
-    Music bgMusic;
-    Music upSound;
-    Music downSound;
-    Music buttonClickedSound;
-    Music eatingSound;
+    private Music bgMusic,upSound,downSound;
+    private Music buttonClickedSound,eatingSound;
     private int soundLevel = 4;
     // Music levels is quarters
     private int musicLevel = 4;
