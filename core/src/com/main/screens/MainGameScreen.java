@@ -467,6 +467,10 @@ public class MainGameScreen implements Screen, InputProcessor {
         }
     }
 
+    public int getEnergyCounter(){
+        return this.energyCounter;
+    }
+
     /**
      * Handles touch input from the user, managing interactions with UI elements and game objects.
      *

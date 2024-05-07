@@ -63,14 +63,14 @@ public class EventManager {
         return (int)((score / 692)* 10);
     }
 
-    private List<Integer> getStreak(List<List<String>> locDays, String event)
+    public List<Integer> getStreak(List<List<String>> locDays, String event)
     {
         if(locDays.size() > 3)
         {
             int bestStreak = 0;
             int currentStreak = 0;
             for (int i = 1; i < locDays.size(); i++) {
-                if (locDays.get(i).contains("event") && locDays.get(i - 1).contains("event")){
+                if (locDays.get(i).contains(event) && locDays.get(i - 1).contains(event)){
                     currentStreak += 1;
                 }
                 else{

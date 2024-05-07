@@ -13,11 +13,13 @@ import com.main.utils.ScreenType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+
 /**
  * The TypingGame class implements a mini-game for the player to increase their study hours.
  * Players are shown a number that they need to memorize and then type it correctly to succeed.
  */
 public class TypingGame implements Screen, InputProcessor {
+
     private final Main game;
     private final int studyDuration;
     private int attempts = 0;
