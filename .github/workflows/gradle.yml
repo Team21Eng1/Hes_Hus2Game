@@ -41,11 +41,11 @@ jobs:
       uses: actions/upload-artifact@v4.3.3
       with:
         name: jacoco-report
-        path: Hes_Hus2Game/assets/go_button.png
+        path: assets/go_button.png
     - name: Upload Build Jar
       uses: actions/upload-artifact@v4.3.3
       with:
         name: Build File
-        path: Hes_Hus2Game/core/build/libs/core-1.0.jar
+        path: core/build/libs/core-1.0.jar
       
  
