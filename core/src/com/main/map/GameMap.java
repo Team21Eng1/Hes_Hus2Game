@@ -26,7 +26,7 @@ public class GameMap extends TiledMap {
      */
     public GameMap(OrthographicCamera camera) {
         // Load the .tmx with the MainMap for game
-        gameMap = new TmxMapLoader().load("map/MainMap.tmx");
+        gameMap = new TmxMapLoader().load("map/Main_Map.tmx");
         MapProperties properties = gameMap.getProperties();
         height = properties.get("tileheight", Integer.class) * properties.get("height", Integer.class);
         width = properties.get("tilewidth", Integer.class) * properties.get("width", Integer.class);
