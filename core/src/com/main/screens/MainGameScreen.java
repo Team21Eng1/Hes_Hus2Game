@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
@@ -393,12 +394,22 @@ public class MainGameScreen implements Screen, InputProcessor {
         game.batch.begin();
         updateEntities(delta);
         drawEntities();
+        drawCSroom();
 
         if (!lockPopup) drawPopUpMenu();
         game.batch.end();
         if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
         fadeOutStep(delta);
     }
+    public void drawRoom(String name)
+    {
+        switch (name)
+        {
+            case "CS":
+                
+        }
+    }
+
 
     private void drawEntities()
     {
@@ -521,7 +532,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         energyBar.dispose();
                         energyBar = setEnergyBar();
                         timeElapsed += duration * secondsPerGameHour;
-                        game.screenManager.setScreen(ScreenType.MINI_GAME, duration);
+                        game.screenManager.setScreen(ScreenType.CS_ROOM, duration);
                     }
                     break;
 
