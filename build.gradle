@@ -16,6 +16,18 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.main.Main'
+        )
+    }
+}
+
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "jacoco"
