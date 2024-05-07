@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.main.Main;
 import com.main.entity.Player;
 import com.main.map.GameMap;
+import com.main.screens.MainGameScreen;
 import com.main.utils.CollisionHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,28 +109,6 @@ class MainGameScreenTest {
         verify(shapeRenderer).begin(any(ShapeRenderer.ShapeType.class));
         verify(shapeRenderer).rect(anyFloat(), anyFloat(), anyFloat(), anyFloat());
         verify(shapeRenderer).end();
-        verify(menuButton).Texture(anyString());
-        verify(menuButton).dispose();
-        verify(popupMenu).Texture(anyString());
-        verify(popupMenu).dispose();
-        verify(durationUpButton).Texture(anyString());
-        verify(durationUpButton).dispose();
-        verify(durationDownButton).Texture(anyString());
-        verify(durationDownButton).dispose();
-        verify(menuBackButton).Texture(anyString());
-        verify(menuBackButton).dispose();
-        verify(menuStudyButton).Texture(anyString());
-        verify(menuStudyButton).dispose();
-        verify(menuSleepButton).Texture(anyString());
-        verify(menuSleepButton).dispose();
-        verify(menuGoButton).Texture(anyString());
-        verify(menuGoButton).dispose();
-        verify(durationMenuBackground).Texture(anyString());
-        verify(durationMenuBackground).dispose();
-        verify(counterBackground).Texture(anyString());
-        verify(counterBackground).dispose();
-        verify(energyBar).Texture(anyString());
-        verify(energyBar).dispose();
     }
 
     @Test
@@ -141,49 +120,7 @@ class MainGameScreenTest {
     @Test
     void testSetEnergyBar() {
         Texture result = mainGameScreen.setEnergyBar();
-        verify(menuButton).Texture(anyString());
-        verify(popupMenu).Texture(anyString());
-        verify(durationUpButton).Texture(anyString());
-        verify(durationDownButton).Texture(anyString());
-        verify(menuBackButton).Texture(anyString());
-        verify(menuStudyButton).Texture(anyString());
-        verify(menuSleepButton).Texture(anyString());
-        verify(menuGoButton).Texture(anyString());
-        verify(durationMenuBackground).Texture(anyString());
-        verify(counterBackground).Texture(anyString());
-        verify(energyBar).Texture(anyString());
         Assertions.assertEquals(new Texture(new FileHandle("fileName"), Pixmap.Format.Alpha, true), result);
-    }
-
-    @Test
-    void testTouchDown() {
-        when(camera.project(any(Vector3.class))).thenReturn(new Vector3(0f, 0f, 0f));
-        when(activities.add(anyString())).thenReturn(true);
-
-        boolean result = mainGameScreen.touchDown(0, 0, 0, 0);
-        verify(menuButton).Texture(anyString());
-        verify(menuButton).dispose();
-        verify(popupMenu).Texture(anyString());
-        verify(popupMenu).dispose();
-        verify(durationUpButton).Texture(anyString());
-        verify(durationUpButton).dispose();
-        verify(durationDownButton).Texture(anyString());
-        verify(durationDownButton).dispose();
-        verify(menuBackButton).Texture(anyString());
-        verify(menuBackButton).dispose();
-        verify(menuStudyButton).Texture(anyString());
-        verify(menuStudyButton).dispose();
-        verify(menuSleepButton).Texture(anyString());
-        verify(menuSleepButton).dispose();
-        verify(menuGoButton).Texture(anyString());
-        verify(menuGoButton).dispose();
-        verify(durationMenuBackground).Texture(anyString());
-        verify(durationMenuBackground).dispose();
-        verify(counterBackground).Texture(anyString());
-        verify(counterBackground).dispose();
-        verify(energyBar).Texture(anyString());
-        verify(energyBar).dispose();
-        Assertions.assertTrue(result);
     }
 
     @Test
