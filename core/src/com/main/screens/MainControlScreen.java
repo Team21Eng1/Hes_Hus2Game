@@ -118,8 +118,8 @@ public class MainControlScreen implements Screen, InputProcessor {
      * Handles touch down input events. Specifically, checks if the back button is pressed
      * and navigates back to the main menu screen.
      *
-     * @param screenX The x-coordinate of the touch, in screen coordinates.
-     * @param screenY The y-coordinate of the touch, in screen coordinates.
+     * @param touchX The x-coordinate of the touch, in screen coordinates.
+     * @param touchY The y-coordinate of the touch, in screen coordinates.
      * @param pointer The pointer for the event.
      * @param button The button pressed.
      * @return true if the event was handled, false otherwise.

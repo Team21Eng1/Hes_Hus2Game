@@ -26,8 +26,9 @@ public class Main extends Game {
 	public OrthographicCamera defaultCamera;
 	public float scaleFactorX;
 	public float scaleFactorY;
+	public Game ScreenManager;
 
-    /**
+	/**
 	 * Called when the game is first created.
 	 * Initializes the game's main components and sets the main menu as the initial screen.
 	 */

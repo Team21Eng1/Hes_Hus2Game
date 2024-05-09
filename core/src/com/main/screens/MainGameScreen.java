@@ -501,7 +501,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         energyBar.dispose();
                         energyBar = setEnergyBar();
                         timeElapsed += duration * secondsPerGameHour;
-                        game.screenManager.setScreen(ScreenType.MINI_GAME, duration);
+                        game.screenManager.setScreen(ScreenType.TYPING_MINI_GAME, duration);
                     }
                     break;
 
@@ -529,6 +529,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                             energyBar = setEnergyBar();
                             timeElapsed += duration * secondsPerGameHour;
                             duration = 1;
+                            game.screenManager.setScreen(ScreenType.PONG_MINI_GAME);
                         }
                     }
                     break;
@@ -551,6 +552,27 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = fadeOut;
                         resetDay();
                         duration = 1;
+                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
+                    }
+                    break;
+                case "eat":
+                    if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
+                        game.audio.buttonClickedSoundActivate();
+                        if (duration < 4) duration++;
+                    } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
+                        game.audio.buttonClickedSoundActivate();
+                        if (duration > 1) duration--;
+                    } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
+                        game.audio.buttonClickedSoundActivate();
+                        showMenu = false;
+                        lockMovement = fadeOut;
+                        duration = 1;
+                    } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
+                        game.audio.buttonClickedSoundActivate();
+                        showMenu = false;
+                        lockMovement = fadeOut;
+                        mealCount++;
+                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
                     }
                     break;
             }
@@ -576,6 +598,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "study";
                         duration = 1;
+
                     }
                     else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
                         game.gameData.buttonClickedSoundActivate();
@@ -585,6 +608,11 @@ public class MainGameScreen implements Screen, InputProcessor {
                         if (energyCounter > 10) energyCounter = 10;
                         energyBar.dispose();
                         energyBar = setEnergyBar();
+                        showMenu = false;
+                        lockMovement = true;
+                        activity = "eat";
+                        duration = 1;
+                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
                     }
                     break;
 

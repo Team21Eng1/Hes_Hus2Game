@@ -8,6 +8,8 @@ public enum ScreenType {
     GAME_SCREEN,
     SETTINGS,
     CONTROLS,
-    MINI_GAME,
+    TYPING_MINI_GAME,
+    PONG_MINI_GAME,
+    SNAKE_MINI_GAME,
     END_SCREEN
 }
