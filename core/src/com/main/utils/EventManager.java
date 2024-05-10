@@ -35,7 +35,7 @@ public class EventManager {
                 case "exercise":
                     score += 10;
                     recCount += 1;
-                    score += -5;
+                    score -= 5;
                     day.add("exercise");
                     break;
                 case "study":
@@ -58,7 +58,19 @@ public class EventManager {
 
         score += (int) Math.round(studyDebuff * studyTotal);
         score += (int) Math.round(recDebuff * recTotal);
-
+        //if you studied 7 days in a row 10 points are added, if you also did recreational activities 15 points are added
+        if(getStreak(days, "study").get(0) == 7 && getStreak(days, "exercise").get(0) == 7){
+            score += 15;
+            if (score > 692){
+                score = 100;
+            }
+        }
+        else if(getStreak(days, "study").get(0) == 7){
+            score += 10;
+            if (score > 692){
+                score = 100;
+            }
+        }
 
         return (int)((score / 692)* 10);
     }
