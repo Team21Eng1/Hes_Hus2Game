@@ -18,6 +18,7 @@ import com.main.entity.Player;
 import com.main.map.GameMap;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
+import com.main.utils.EventManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -424,10 +425,21 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         // Ensure the hour cycles through the active hours correctly (8 AM to 12 AM)
         if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
-            if (dayNum == 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
+            if (dayNum == 7)
+            {
+                int score = EventManager.getScore(activities);
+                game.screenManager.setScreen(ScreenType.LEADERBOARD);
+                game.screenManager.setScreen(ScreenType.END_SCREEN);
+
+            }
             resetDay();
         }
-        if (dayNum > 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
+        if (dayNum > 7)
+        {
+            game.screenManager.setScreen(ScreenType.LEADERBOARD);
+            game.screenManager.setScreen(ScreenType.END_SCREEN);
+        }
+
     }
 
     /**

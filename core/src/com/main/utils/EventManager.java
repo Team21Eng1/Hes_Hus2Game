@@ -6,7 +6,7 @@ import java.util.List;
 public class EventManager {
 
 
-    public int getScore(List<String> playedEvents) {
+    public static int getScore(List<String> playedEvents) {
         int score = 0;
         int cumulativeEat = 1;
         int cumulativeSleep = 1;
@@ -75,7 +75,7 @@ public class EventManager {
         return (int)((score / 692)* 10);
     }
 
-    public List<Integer> getStreak(List<List<String>> locDays, String event)
+    public static List<Integer> getStreak(List<List<String>> locDays, String event)
     {
         List<Integer> returns = new ArrayList<>();
         if(locDays.size() > 3)
