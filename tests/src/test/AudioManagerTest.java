@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.audio.Music;
 import com.main.utils.AudioManager;
@@ -10,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-class AudioManagerTest {
+public class AudioManagerTest {
     @Mock
     Music bgMusic;
     @Mock

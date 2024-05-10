@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
 
-class CollisionHandlerTest {
+public class CollisionHandlerTest {
     @Mock
     TiledMap tiledMap;
     @Mock

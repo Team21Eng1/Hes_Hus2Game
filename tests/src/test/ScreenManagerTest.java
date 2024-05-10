@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.Screen;
 import com.main.Main;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-class ScreenManagerTest {
+public class ScreenManagerTest {
     @Mock
     Main game;
     @Mock

@@ -70,5 +70,7 @@ project(":tests"){
         implementation project(":core")
         implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
         implementation 'org.mockito:mockito-testng:0.5.2'
+        runtimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
     }
 }
