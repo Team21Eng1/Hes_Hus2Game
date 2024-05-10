@@ -62,3 +62,13 @@ project(":desktop") {
 //      compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }
 }
+
+project(":tests"){
+    apply plugin:  "java-library"
+
+    dependencies {
+        implementation project(":core")
+        implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+        implementation 'org.mockito:mockito-testng:0.5.2'
+    }
+}

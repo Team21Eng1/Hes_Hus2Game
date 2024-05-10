@@ -1,4 +1,4 @@
-package tests;
+package com.main.tests;
 
 import com.main.utils.EventManager;
 import org.junit.jupiter.api.Assertions;

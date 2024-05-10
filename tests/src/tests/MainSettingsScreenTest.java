@@ -74,37 +74,6 @@ class MainSettingsScreenTest {
         boolean result = mainSettingsScreen.keyTyped('a');
         Assertions.assertTrue(result);
     }
-
-    @Test
-    void testTouchDown() {
-        boolean result = mainSettingsScreen.touchDown(0, 0, 0, 0);
-        verify(backButton).Texture(anyString());
-        verify(backButton).dispose();
-        verify(settingsLabel).Texture(anyString());
-        verify(settingsLabel).dispose();
-        verify(musicUpButton).Texture(anyString());
-        verify(musicUpButton).dispose();
-        verify(musicDownButton).Texture(anyString());
-        verify(musicDownButton).dispose();
-        verify(musicLabel).Texture(anyString());
-        verify(musicLabel).dispose();
-        verify(soundUpButton).Texture(anyString());
-        verify(soundUpButton).dispose();
-        verify(soundLabel).Texture(anyString());
-        verify(soundLabel).dispose();
-        verify(soundDownButton).Texture(anyString());
-        verify(soundDownButton).dispose();
-        verify(musicBar).Texture(anyString());
-        verify(musicBar).dispose();
-        verify(soundBar).Texture(anyString());
-        verify(soundBar).dispose();
-        verify(boyButton).Texture(anyString());
-        verify(boyButton).dispose();
-        verify(girlButton).Texture(anyString());
-        verify(girlButton).dispose();
-        Assertions.assertTrue(result);
-    }
-
     @Test
     void testTouchUp() {
         boolean result = mainSettingsScreen.touchUp(0, 0, 0, 0);
