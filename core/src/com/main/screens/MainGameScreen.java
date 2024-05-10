@@ -1,10 +1,11 @@
 package com.main.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -14,11 +15,12 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
-import com.main.entity.Student;
 import com.main.map.GameMap;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The MainGameScreen class is responsible for rendering and updating all the game elements
@@ -57,8 +59,7 @@ public class MainGameScreen implements Screen, InputProcessor {
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
 
-
-    private Student student;
+    private List<String> activities = new ArrayList<>();
 
     /**
      * Constructs the main game screen with necessary game components.
@@ -100,9 +101,6 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.camera = new OrthographicCamera();
         this.gameMap = new GameMap(this.camera);
         this.player = new Player(this.game, this.gameMap, this.camera);
-
-        this.student = new Student(this.game, this.gameMap);
-
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.popupFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.durationFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -391,25 +389,12 @@ public class MainGameScreen implements Screen, InputProcessor {
         gameMap.render();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        updateEntities(delta);
-        drawEntities();
-
+        game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
         if (!lockPopup) drawPopUpMenu();
         game.batch.end();
         if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
         fadeOutStep(delta);
     }
-
-    private void drawEntities()
-    {
-        game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
-        game.batch.draw(student.getCurrentFrame(),student.worldX,student.worldY,Student.spriteX,Student.spriteY);
-    }
-    private void updateEntities(float delta)
-    {
-        student.update(delta);
-    }
-
 
     /**
      * Renders the UI elements of the game.
@@ -442,6 +427,7 @@ public class MainGameScreen implements Screen, InputProcessor {
             if (dayNum == 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
             resetDay();
         }
+        if (dayNum > 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
     }
 
     /**
@@ -479,6 +465,10 @@ public class MainGameScreen implements Screen, InputProcessor {
         } else {
             return new Texture("energy/energy_0.png");
         }
+    }
+
+    public int getEnergyCounter(){
+        return this.energyCounter;
     }
 
     /**
@@ -585,6 +575,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     break;
@@ -595,6 +586,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
@@ -605,6 +597,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         if (energyCounter > 10) energyCounter = 10;
                         energyBar.dispose();
                         energyBar = setEnergyBar();
+                        activities.add("eat");
                     }
                     break;
 
@@ -615,6 +608,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "exercise";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
 
@@ -625,6 +619,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "sleep";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
             }
