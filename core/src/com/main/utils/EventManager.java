@@ -65,6 +65,7 @@ public class EventManager {
 
     public List<Integer> getStreak(List<List<String>> locDays, String event)
     {
+        List<Integer> returns = new ArrayList<>();
         if(locDays.size() > 3)
         {
             int bestStreak = 0;
@@ -79,11 +80,14 @@ public class EventManager {
                     }
                 }
             }
-            return List.of(bestStreak, currentStreak);
+            returns.add(bestStreak);
+            returns.add(currentStreak);
         }
         else{
-            return List.of(0, 0);
+            returns.add(0);
+            returns.add(0);
         }
+        return returns;
 
 
     }
