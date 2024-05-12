@@ -19,7 +19,7 @@ import java.util.List;
 public class LeaderboardScreen implements Screen, InputProcessor {
     Main game;
     BitmapFont font, titleFont;
-    List<String[]> highScores;  // List to hold score entries as arrays
+    List<String[]> highScores;
     private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
     private float titleY;
@@ -34,20 +34,19 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
         calculateDimensions();
         calculatePositions();
-        titleFont.getData().setScale(3.0f * game.scaleFactorX, 3.0f * game.scaleFactorY);  // Increased scale for title
+        titleFont.getData().setScale(3.0f * game.scaleFactorX, 3.0f * game.scaleFactorY);
     }
 
     private void loadHighScores() {
         FileHandle file = Gdx.files.local("leaderboard.csv");
         if (file.exists()) {
             String[] scoreEntries = file.readString().split("\\r?\\n");
-            for (int i = 1; i < scoreEntries.length; i++) { // Skip the header
+            for (int i = 1; i < scoreEntries.length; i++) {
                 String[] parts = scoreEntries[i].split(",");
                 if (parts.length == 2) {
                     highScores.add(new String[] { parts[0].trim(), parts[1].trim() });
                 }
             }
-            // Sort the scores in descending order and take the top 10
             Collections.sort(highScores, new Comparator<String[]>() {
                 @Override
                 public int compare(String[] o1, String[] o2) {
@@ -67,7 +66,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     private void calculatePositions() {
         backButtonX = (game.screenWidth - backButtonWidth) / 2f;
         backButtonY = game.screenHeight / 6f - 120 * game.scaleFactorY;
-        titleY = game.screenHeight - 100;  // Position for the title
+        titleY = game.screenHeight - 100;
     }
 
     @Override
@@ -81,11 +80,11 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.begin();
         titleFont.draw(game.batch, "Leaderboard", 0, titleY, game.screenWidth, Align.center, false);
-        float y = titleY - 200; // Adjust starting position for scores to accommodate the title
+        float y = titleY - 200;
         for (String[] scoreEntry : highScores) {
             String displayText = scoreEntry[0] + ": " + scoreEntry[1];
             font.draw(game.batch, displayText, 0, y, game.screenWidth, Align.center, false);
-            y -= font.getLineHeight(); // Move to the next line
+            y -= font.getLineHeight();
         }
         game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
         game.batch.end();
@@ -94,9 +93,9 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     private String formatScoreEntry(String scoreEntry) {
         String[] parts = scoreEntry.split(",");
         if (parts.length == 2) {
-            return parts[0].trim() + ": " + parts[1].trim(); // Format as "Name: Score"
+            return parts[0].trim() + ": " + parts[1].trim();
         }
-        return scoreEntry; // Return original if not in expected format
+        return scoreEntry;
     }
 
     /**
@@ -157,8 +156,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        // Implement scrolling behavior if needed
-        return false; // Return false if the event was not handled
+        return false;
     }
 
     @Override

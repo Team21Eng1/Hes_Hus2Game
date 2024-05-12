@@ -106,6 +106,8 @@ public class ScreenManager {
                 return new EndScreen(game);
             case LEADERBOARD:
                 return new LeaderboardScreen(game);
+            case SAVE:
+                return new SaveScreen(game);
         }
         return null;
     }
