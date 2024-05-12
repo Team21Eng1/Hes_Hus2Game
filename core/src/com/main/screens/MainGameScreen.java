@@ -1,5 +1,6 @@
 package com.main.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputProcessor;
@@ -8,14 +9,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
+import com.main.entity.Entity;
 import com.main.entity.Player;
 import com.main.entity.Student;
+import com.main.map.CS;
 import com.main.map.GameMap;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.main.utils.CollisionHandler;
@@ -41,6 +45,7 @@ public class MainGameScreen implements Screen, InputProcessor {
             durationMenuBackground, counterBackground;
     private final float gameDayLengthInSeconds;
     private final float secondsPerGameHour;
+    private final OrthographicCamera roomCam;
 
     // Non-final attributes
     private Texture energyBar;
@@ -60,6 +65,8 @@ public class MainGameScreen implements Screen, InputProcessor {
 
 
     private Student student;
+    float timer,t;
+    public GameMap roomMap;
 
     /**
      * Constructs the main game screen with necessary game components.
@@ -99,10 +106,12 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         // Setting up the game
         this.camera = new OrthographicCamera();
-        this.gameMap = new GameMap(this.camera);
+        this.roomCam = new OrthographicCamera();
+        this.gameMap = new GameMap(this.game,this.camera,"map/MainMap.tmx");
         this.player = new Player(this.game, this.gameMap, this.camera);
 
-        this.student = new Student(this.game, this.gameMap);
+        this.student = new Student(this.gameMap,1500,600);
+        this.student.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
 
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.popupFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -115,7 +124,11 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.popupFont.getData().setScale(0.4f, 0.4f);
         this.player.setPos(1389, 635);
         this.camera.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
+        this.roomCam.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
         this.camera.update();
+        this.roomCam.update();
+
+        roomMap = null;
     }
 
 
@@ -390,29 +403,55 @@ public class MainGameScreen implements Screen, InputProcessor {
     private void drawWorldElements(float delta){
         gameMap.update(delta);
         gameMap.render();
+
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
+
+
+        drawRoom(delta,game.batch);
         updateEntities(delta);
         drawEntities();
-        drawCSroom();
-
         if (!lockPopup) drawPopUpMenu();
         game.batch.end();
         if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
         fadeOutStep(delta);
     }
-    public void drawRoom(String name)
+    public void drawRoom(float delta,SpriteBatch batch)
     {
-        switch (name)
+        updateRoom(delta);
+        if (roomMap != null)
         {
-            case "CS":
-                
+            roomCam.position.x = roomMap.getWidth()/2;
+            roomCam.position.y = roomMap.getHeight()/2;
+
+            roomMap.update(delta);
+            roomMap.render();
+
+            roomMap.renderEntities(batch);
         }
     }
+    public void updateRoom(float delta)
+    {
+        if (roomMap == null)
+        {
+            timer = 10;
+            t=0;
+        } else {
+            t+= delta;
+            if (t>timer)
+            {
+                roomMap = null;
+                lockMovement = false;
+            }
+        }
+
+    }
+
 
 
     private void drawEntities()
     {
+        int sX = Player.spriteX;
         game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
         game.batch.draw(student.getCurrentFrame(),student.worldX,student.worldY,Student.spriteX,Student.spriteY);
     }
@@ -532,7 +571,10 @@ public class MainGameScreen implements Screen, InputProcessor {
                         energyBar.dispose();
                         energyBar = setEnergyBar();
                         timeElapsed += duration * secondsPerGameHour;
-                        game.screenManager.setScreen(ScreenType.CS_ROOM, duration);
+                        //game.screenManager.setScreen(ScreenType.CS_ROOM, duration);
+                        roomMap = new CS(this.game,roomCam,"map/interior_maps/library.tmx");
+                        lockMovement = true;
+
                     }
                     break;
 

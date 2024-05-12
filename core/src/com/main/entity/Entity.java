@@ -4,11 +4,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.utils.CollisionHandler;
 
 import java.util.ArrayList;
 
 public class Entity extends Sprite {
+    public CollisionHandler collisionHandler;
     public float worldX, worldY;
+    public static int spriteX;// this is in reference to the sprite sheet
+    public static int spriteY;
     public float speed; // walking speed per frame
     public Animation<TextureRegion> currentAnimation;
     public float stateTime; // Tracks animation time
@@ -58,6 +62,17 @@ public class Entity extends Sprite {
 
     public TextureRegion getCurrentFrame(){
         return currentAnimation.getKeyFrame(stateTime, true);
+    }
+
+    public void update(float delta) {
+    }
+    public int getSpriteX()
+    {
+        return spriteX;
+    }
+    public int getSpriteY()
+    {
+        return spriteY;
     }
 
 }
