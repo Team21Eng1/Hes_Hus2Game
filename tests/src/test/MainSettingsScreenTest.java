@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.main.Main;
@@ -12,7 +12,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-class MainSettingsScreenTest {
+public class MainSettingsScreenTest {
     @Mock
     Main game;
     @Mock

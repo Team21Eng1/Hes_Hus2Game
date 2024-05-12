@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-class EventManagerTest {
+public class EventManagerTest {
     EventManager eventManager = new EventManager();
 
     @Test

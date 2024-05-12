@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-class MainGameScreenTest {
+public class MainGameScreenTest {
     @Mock
     Color shader;
     @Mock

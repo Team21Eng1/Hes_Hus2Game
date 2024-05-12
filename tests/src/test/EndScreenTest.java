@@ -1,4 +1,4 @@
-package tests;
+package test;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-class EndScreenTest {
+public class EndScreenTest {
     @Mock
     Main game;
     @Mock
