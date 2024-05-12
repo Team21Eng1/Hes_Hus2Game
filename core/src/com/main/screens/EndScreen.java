@@ -31,7 +31,7 @@ public class EndScreen implements Screen, InputProcessor {
     private void loadAssets() {
         playAgainButton = new Texture("end_gui/play_button.png");
         exitButton = new Texture("end_gui/exit_button.png");
-        leaderboardButton = new Texture("menu_gui/play_button.png"); // Make sure the asset exists
+        leaderboardButton = new Texture("menu_gui/score_button.png"); // Make sure the asset exists
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
     }
 

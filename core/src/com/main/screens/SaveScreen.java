@@ -25,7 +25,7 @@ public class SaveScreen implements Screen, InputProcessor {
         this.game = game;
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         titleFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        saveButton = new Texture("menu_gui/play_button.png");
+        saveButton = new Texture("menu_gui/save_button.png");
         calculateDimensions();
         calculatePositions();
         Gdx.input.setInputProcessor(this);
