@@ -3,9 +3,11 @@ package com.main.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.main.Main;
+import com.main.minigames.*;
 import com.main.screens.*;
 
 import javax.swing.plaf.BorderUIResource;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -18,6 +20,7 @@ public class ScreenManager {
     private final Map<ScreenType, Screen> screensInMemory;
     private Screen curScreen;
     private ScreenType curScreenType;
+    private Pong pong;
 
     /**
      * Initializes the ScreenManager with a reference to the main game class.
@@ -101,10 +104,14 @@ public class ScreenManager {
                 return new MainSettingsScreen(game);
             case CONTROLS:
                 return new MainControlScreen(game);
-            case MINI_GAME:
+            case TYPING_MINI_GAME:
                 return new TypingGame(game, (int) args[0]);
             case END_SCREEN:
                 return new EndScreen(game);
+            case PONG_MINI_GAME:
+                return new Pong(game);
+            case  SNAKE_MINI_GAME:
+                return new snakegame(game);
             case LEADERBOARD:
                 return new LeaderboardScreen(game);
             case TUTORIAL:
