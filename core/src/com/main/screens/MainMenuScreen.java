@@ -131,7 +131,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
         if (touchX >= x && touchX <= x + playButtonWidth &&
                 touchY >= playButtonY && touchY <= playButtonY + playButtonHeight) {
             game.audio.buttonClickedSoundActivate();
-            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+            game.screenManager.setScreen(ScreenType.TUTORIAL);
         }
         else if (touchX >= x && touchX <= x + controlsButtonWidth &&
                 touchY >= controlsButtonY && touchY <= controlsButtonY + controlsButtonHeight) {
