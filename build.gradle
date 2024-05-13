@@ -1,4 +1,6 @@
 buildscript {
+
+
     
 
     repositories {
@@ -14,8 +16,21 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.main.Main'
+        )
+    }
+}
+
 allprojects {
     apply plugin: "eclipse"
+    apply plugin: "jacoco"
 
     version = '1.0'
     ext {
@@ -26,6 +41,7 @@ allprojects {
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
+
     }
 
     repositories {
