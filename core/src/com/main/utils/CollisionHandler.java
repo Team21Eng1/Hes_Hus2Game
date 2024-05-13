@@ -18,7 +18,7 @@ public class CollisionHandler {
 
     private final float objWidth, objHeight;
     private final float offSetX, offSetY;
-    private final ArrayList<TiledMapTileLayer> collisionLayers;
+    private ArrayList<TiledMapTileLayer> collisionLayers;
 
     /**
      * Constructs a CollisionHandler with specified parameters.
@@ -51,6 +51,9 @@ public class CollisionHandler {
         for (String layer : args) {
             collisionLayers.add((TiledMapTileLayer) tiledMap.getLayers().get(layer));
         }
+    }
+    public void clearCollisionLayers(){
+        this.collisionLayers = new ArrayList<>();
     }
 
     /**

@@ -23,12 +23,11 @@ public class Player extends Entity implements Disposable {
     Main game;
     GameMap gameMap;
     OrthographicCamera camera;
-    CollisionHandler collisionHandler;
+    public boolean camFollow = true;
 
     char dir; // Current direction of the player
     public static final float animation_speed = 0.12f; // speed that sprite will animate or frame duration
-    public static final int spriteX = 15;// this is in reference to the sprite sheet
-    public static final int spriteY = 23;
+
     int tileSize;
 
     public float startX, startY;
@@ -37,7 +36,8 @@ public class Player extends Entity implements Disposable {
 
     Animation<TextureRegion> walkDownAnimation, walkRightAnimation, walkLeftAnimation, walkUpAnimation;
     Animation<TextureRegion> idleDownAnimation, idleRightAnimation, idleLeftAnimation, idleUpAnimation;
-
+    public static int spriteX = 15;
+    public static int spriteY = 23;
 
     /**
      * Constructs a new Player instance.
@@ -51,8 +51,9 @@ public class Player extends Entity implements Disposable {
         this.gameMap = gameMap;
         this.camera = camera;
 
+
         tileSize = gameMap.getTileSize();
-        this.collisionHandler = new CollisionHandler(gameMap.getMap(), tileSize, tileSize, spriteX, spriteY * 0.5f, 0.7f, 0.7f);
+        this.collisionHandler = new CollisionHandler(gameMap.getMap(), tileSize, tileSize, spriteX,  spriteY *0.5f, 0.7f, 0.7f);
         this.collisionHandler.addCollisionLayers("Trees", "wall_1", "wall_2", "wall_3", "roof_1", "roof_2", "roof_3", "other", "lilipads");
         //this.settingsScreen = settingsScreen;
 
@@ -149,10 +150,17 @@ public class Player extends Entity implements Disposable {
 
 
         stateTime += delta;
+        if (camFollow) camUpdate();
+
+
+
+
+    }
+    public void camUpdate()
+    {
 
         float camX = worldX + spriteY /2f;
         float camY = worldY + spriteY /2f;
-
         camera.position.set(camX, camY, 0);
         // this will make sure the camera follows the player
         if (camX + camera.viewportWidth/2f > gameMap.getWidth()) {
@@ -169,8 +177,8 @@ public class Player extends Entity implements Disposable {
         }
 
         camera.update();
-
     }
+
 
     /**
      * Sets the player's position to the specified coordinates.
@@ -256,5 +264,15 @@ public class Player extends Entity implements Disposable {
     public void dispose(){
         idleSheet.dispose();
         walkSheet.dispose();
+    }
+    @Override
+    public int getSpriteX()
+    {
+        return spriteX;
+    }
+    @Override
+    public int getSpriteY()
+    {
+        return spriteY;
     }
 }
