@@ -130,7 +130,7 @@ public class MainControlScreen implements Screen, InputProcessor {
         if (touchX >= backButtonX && touchX <= backButtonX + backButtonWidth &&
                 touchY >= backButtonY && touchY <= backButtonY + backButtonHeight) {
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
         }
         return true;
     }

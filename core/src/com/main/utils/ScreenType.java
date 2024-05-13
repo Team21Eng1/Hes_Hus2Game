@@ -11,5 +11,8 @@ public enum ScreenType {
     TYPING_MINI_GAME,
     PONG_MINI_GAME,
     SNAKE_MINI_GAME,
-    END_SCREEN
+    MINI_GAME,
+    END_SCREEN,
+    LEADERBOARD,
+    TUTORIAL
 }

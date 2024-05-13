@@ -8,7 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import static com.badlogic.gdx.Gdx.graphics;
-import com.main.utils.GameData;
+
+import com.main.utils.AudioManager;
 import com.main.utils.ScreenManager;
 import com.main.utils.ScreenType;
 
@@ -17,8 +18,8 @@ import com.main.utils.ScreenType;
  * It initializes and manages the game's resources, screens, and settings.
  */
 public class Main extends Game {
-	public SpriteBatch batch; // Used for drawing textures and sprites in batches
-	public GameData gameData; // Manages the game's data, such as settings and player information
+	public SpriteBatch batch; // Used for drawing textures and sprites in batchesw
+	public AudioManager audio;
 	public ScreenManager screenManager; // Manages the game's screens, allowing for easy transitions
 	public int screenWidth, screenHeight; // The current width and height of the screen
 	public int defWidth, defHeight; // Default screen width and height, used for UI scaling
@@ -35,7 +36,7 @@ public class Main extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		gameData = new GameData();
+		audio = new AudioManager();
 		screenWidth = graphics.getWidth();
 		screenHeight = graphics.getHeight();
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.badlogic.gdx.InputProcessor;
 import com.main.utils.ScreenType;
+import com.main.screens.LeaderboardScreen;
 
 /**
  * The MainMenuScreen class represents the main menu screen for the game.
@@ -17,14 +18,15 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
     Main game;
 
-    Texture heslingtonHustleLabel, playButton, controlsButton, settingsButton, exitButton;
+    // Need to add a leaderboard button texture
+    Texture heslingtonHustleLabel, playButton, controlsButton, settingsButton, exitButton, leaderButton;
 
-    int heslingtonHustleLabelHeight, playButtonHeight, controlsButtonHeight, settingsButtonHeight, exitButtonHeight;
-    int heslingtonHustleLabelWidth, playButtonWidth, controlsButtonWidth, settingsButtonWidth, exitButtonWidth;
+    int heslingtonHustleLabelHeight, playButtonHeight, controlsButtonHeight, settingsButtonHeight, exitButtonHeight, leaderButtonHeight;
+    int heslingtonHustleLabelWidth, playButtonWidth, controlsButtonWidth, settingsButtonWidth, exitButtonWidth, leaderButtonWidth;
 
     int x;
     float heslingtonHustleLabelX;
-    float heslingtonHustleLabelY, playButtonY, controlsButtonY, settingsButtonY, exitButtonY;
+    float heslingtonHustleLabelY, playButtonY, controlsButtonY, settingsButtonY, exitButtonY, leaderButtonY;
 
     boolean exitFlag;
 
@@ -48,6 +50,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
     private void loadTextures() {
         heslingtonHustleLabel = new Texture("menu_gui/heslington_hustle_label.png");
         playButton = new Texture("menu_gui/play_button.png");
+        leaderButton = new Texture("menu_gui/play_button.png");
         controlsButton = new Texture("menu_gui/controls_button.png");
         settingsButton = new Texture("menu_gui/settings_button.png");
         exitButton = new Texture("menu_gui/exit_button.png");
@@ -67,6 +70,8 @@ public class MainMenuScreen implements Screen, InputProcessor {
         settingsButtonWidth = (int) (settingsButton.getWidth() * 10 * game.scaleFactorX);
         exitButtonHeight = (int) (exitButton.getHeight() * 10 * game.scaleFactorY);
         exitButtonWidth = (int) (exitButton.getWidth() * 10 * game.scaleFactorX);
+        leaderButtonHeight = (int) (leaderButton.getHeight() * 10 * game.scaleFactorY);
+        leaderButtonWidth = (int) (leaderButton.getWidth() * 10 * game.scaleFactorX);
     }
 
     /**
@@ -74,12 +79,13 @@ public class MainMenuScreen implements Screen, InputProcessor {
      */
     private void calculatePositions() {
         heslingtonHustleLabelX = (game.screenWidth - heslingtonHustleLabelWidth) / 2f;
-        x = (int) ((game.screenWidth - playButtonWidth) / 2f); // this is to make sure the buttons are centered
-        heslingtonHustleLabelY = game.screenHeight - heslingtonHustleLabelHeight * 1.25f;
-        playButtonY = game.screenHeight - playButtonHeight * 2.5f;
-        controlsButtonY = game.screenHeight - controlsButtonHeight * 3.75f;
-        settingsButtonY = game.screenHeight - settingsButtonHeight * 5f;
-        exitButtonY = game.screenHeight - exitButtonHeight * 6.25f;
+        x = (int) ((game.screenWidth - playButtonWidth) / 2f);
+        heslingtonHustleLabelY = game.screenHeight - heslingtonHustleLabelHeight * 1.0625f;
+        playButtonY = game.screenHeight - playButtonHeight * 2.25f;
+        controlsButtonY = game.screenHeight - controlsButtonHeight * 3.4375f;
+        settingsButtonY = game.screenHeight - settingsButtonHeight * 4.625f;
+        leaderButtonY = game.screenHeight - leaderButtonHeight * 5.8125f;
+        exitButtonY = game.screenHeight - exitButtonHeight * 7f;
     }
 
     @Override
@@ -100,6 +106,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
         game.batch.draw(controlsButton, x, controlsButtonY, controlsButtonWidth, controlsButtonHeight);
         game.batch.draw(settingsButton, x, settingsButtonY, settingsButtonWidth, settingsButtonHeight);
         game.batch.draw(exitButton, x, exitButtonY, exitButtonWidth, exitButtonHeight);
+        game.batch.draw(leaderButton, x, leaderButtonY, leaderButtonWidth, leaderButtonHeight);
         game.batch.end();
     }
 
@@ -123,27 +130,33 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
         if (touchX >= x && touchX <= x + playButtonWidth &&
                 touchY >= playButtonY && touchY <= playButtonY + playButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
-            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+            game.audio.buttonClickedSoundActivate();
+            game.screenManager.setScreen(ScreenType.TUTORIAL);
         }
         else if (touchX >= x && touchX <= x + controlsButtonWidth &&
                 touchY >= controlsButtonY && touchY <= controlsButtonY + controlsButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.CONTROLS);
         }
         else if (touchX >= x && touchX <= x + settingsButtonWidth &&
                 touchY >= settingsButtonY && touchY <= settingsButtonY + settingsButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.SETTINGS);
         }
         else if (touchX >= x && touchX <= x + exitButtonWidth &&
                 touchY >= exitButtonY && touchY <= exitButtonY + exitButtonHeight) {
-            game.gameData.buttonClickedSoundActivate();
+            game.audio.buttonClickedSoundActivate();
             game.screenManager.clearMemory();
             exitFlag = true;
             dispose();
             Gdx.app.exit();
         }
+        else if (touchX >= x && touchX <= x + leaderButtonWidth &&
+                touchY >= leaderButtonY && touchY <= leaderButtonY + leaderButtonHeight) {
+            game.audio.buttonClickedSoundActivate();
+            game.screenManager.setScreen(ScreenType.LEADERBOARD);
+        }
+
         return true;
     }
 
