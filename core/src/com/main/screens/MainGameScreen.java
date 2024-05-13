@@ -2,10 +2,11 @@ package com.main.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -18,12 +19,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Entity;
 import com.main.entity.Player;
+
 import com.main.entity.Student;
 import com.main.map.CS;
+
 import com.main.map.GameMap;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
+import com.main.utils.EventManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The MainGameScreen class is responsible for rendering and updating all the game elements
@@ -62,6 +68,9 @@ public class MainGameScreen implements Screen, InputProcessor {
     private int energyCounter, duration, dayNum, recActivity, studyHours, mealCount, currentHour;
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
+
+
+    private List<String> activities = new ArrayList<>();
 
 
     private Student student;
@@ -110,8 +119,10 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.gameMap = new GameMap(this.game,this.camera,"map/MainMap.tmx");
         this.player = new Player(this.game, this.gameMap, this.camera);
 
+
         this.student = new Student(this.gameMap,1500,600);
         this.student.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
+
 
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.popupFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -408,9 +419,11 @@ public class MainGameScreen implements Screen, InputProcessor {
         game.batch.begin();
 
 
+
         drawRoom(delta,game.batch);
         updateEntities(delta);
         drawEntities();
+
         if (!lockPopup) drawPopUpMenu();
         game.batch.end();
         if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
@@ -449,6 +462,7 @@ public class MainGameScreen implements Screen, InputProcessor {
 
 
 
+
     private void drawEntities()
     {
         int sX = Player.spriteX;
@@ -459,6 +473,7 @@ public class MainGameScreen implements Screen, InputProcessor {
     {
         student.update(delta);
     }
+
 
 
     /**
@@ -489,9 +504,21 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         // Ensure the hour cycles through the active hours correctly (8 AM to 12 AM)
         if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
-            if (dayNum == 7) game.screenManager.setScreen(ScreenType.END_SCREEN);
+            if (dayNum == 7)
+            {
+                int score = EventManager.getScore(activities);
+                game.screenManager.setScreen(ScreenType.LEADERBOARD);
+                game.screenManager.setScreen(ScreenType.END_SCREEN);
+
+            }
             resetDay();
         }
+        if (dayNum > 7)
+        {
+            game.screenManager.setScreen(ScreenType.LEADERBOARD);
+            game.screenManager.setScreen(ScreenType.END_SCREEN);
+        }
+
     }
 
     /**
@@ -529,6 +556,10 @@ public class MainGameScreen implements Screen, InputProcessor {
         } else {
             return new Texture("energy/energy_0.png");
         }
+    }
+
+    public int getEnergyCounter(){
+        return this.energyCounter;
     }
 
     /**
@@ -638,6 +669,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     break;
@@ -648,6 +680,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = true;
                         lockMovement = true;
                         activity = "study";
+                        activities.add(activity);
                         duration = 1;
                     }
                     else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
@@ -658,6 +691,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         if (energyCounter > 10) energyCounter = 10;
                         energyBar.dispose();
                         energyBar = setEnergyBar();
+                        activities.add("eat");
                     }
                     break;
 
@@ -668,6 +702,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "exercise";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
 
@@ -678,6 +713,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = true;
                         activity = "sleep";
                         duration = 1;
+                        activities.add(activity);
                     }
                     break;
             }

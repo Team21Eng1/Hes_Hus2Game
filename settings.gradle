@@ -1,4 +1,10 @@
 include 'core', 'desktop'
+
+include 'Testing'
+include 'Testing:src:main:io.dimitris.Hes_hus2Game.Testing'
+findProject(':Testing:src:main:io.dimitris.Hes_hus2Game.Testing')?.name = 'io.dimitris.Hes_hus2Game.Testing'
+include 'tests'
+
 include 'Test'
 include 'Test'
 
