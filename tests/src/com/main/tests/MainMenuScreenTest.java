@@ -1,4 +1,4 @@
-package test;
+package com.main.tests;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.main.Main;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
@@ -26,11 +27,11 @@ public class MainMenuScreenTest {
     @Mock
     Texture exitButton;
     @InjectMocks
-    MainMenuScreen mainMenuScreen;
+    MainMenuScreen mainMenuScreen = new MainMenuScreen(game);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

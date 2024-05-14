@@ -1,10 +1,11 @@
-package test;
+package com.main.tests;
 
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.main.map.GameMap;
 import com.main.utils.CollisionHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,22 +13,27 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 
+import static com.main.entity.Student.spriteX;
+import static com.main.entity.Student.spriteY;
 import static org.mockito.Mockito.*;
 
 public class CollisionHandlerTest {
+    @Mock
+    GameMap gamemap;
     @Mock
     TiledMap tiledMap;
     @Mock
     ArrayList<TiledMapTileLayer> collisionLayers;
     @InjectMocks
-    CollisionHandler collisionHandler;
+    CollisionHandler collisionHandler = new CollisionHandler(gamemap.getMap(), gamemap.getTileSize(), gamemap.getTileSize(), spriteX, spriteY * 0.5f, 0.7f, 0.7f);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

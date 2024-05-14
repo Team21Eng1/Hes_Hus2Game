@@ -1,4 +1,4 @@
-package test;
+package com.main.tests;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
@@ -26,7 +27,7 @@ public class TypingGameTest {
     @Mock
     Texture title;
     @InjectMocks
-    TypingGame typingGame;
+    TypingGame typingGame = new TypingGame(game, 999);
 
     @BeforeEach
     void setUp() {

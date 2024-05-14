@@ -1,5 +1,6 @@
-package test;
+package com.main.tests;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.main.utils.AudioManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +23,11 @@ public class AudioManagerTest {
     @Mock
     Music eatingSound;
     @InjectMocks
-    AudioManager audioManager;
+    AudioManager audioManager = new AudioManager();
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

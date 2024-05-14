@@ -3,10 +3,13 @@ package com.main.tests;
 import com.main.utils.EventManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+
 
 import java.util.List;
 
 public class EventManagerTest {
+    @InjectMocks
     EventManager eventManager = new EventManager();
 
     @Test

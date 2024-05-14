@@ -1,4 +1,4 @@
-package test;
+package com.main.tests;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
@@ -73,11 +74,11 @@ public class MainGameScreenTest {
     @Mock
     List<String> activities;
     @InjectMocks
-    MainGameScreen mainGameScreen;
+    MainGameScreen mainGameScreen = new MainGameScreen(game);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

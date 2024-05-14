@@ -1,4 +1,4 @@
-package test;
+package com.main.tests;
 
 import com.badlogic.gdx.Screen;
 import com.main.Main;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,11 @@ public class ScreenManagerTest {
     Screen curScreen;
 
     @InjectMocks
-    ScreenManager screenManager;
+    ScreenManager screenManager = new ScreenManager(game);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
