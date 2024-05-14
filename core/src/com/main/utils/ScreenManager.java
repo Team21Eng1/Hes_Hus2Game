@@ -111,6 +111,8 @@ public class ScreenManager {
                 return new SaveScreen(game);
             case TUTORIAL:
                 return new TutorialScreen(game);
+            case ACHIEVEMENTS:
+                return new AchievementsScreen(game);
         }
         return null;
     }

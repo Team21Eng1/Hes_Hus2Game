@@ -12,11 +12,11 @@ import com.main.utils.ScreenType;
 
 public class EndScreen implements Screen, InputProcessor {
     Main game;
-    Texture playAgainButton, exitButton, leaderboardButton; // Renamed saveButton to leaderboardButton
+    Texture playAgainButton, exitButton, leaderboardButton, achievementsButton;
     BitmapFont font;
     String titleText;
-    float playAgainButtonY, exitButtonY, leaderboardButtonY; // Renamed saveButtonY to leaderboardButtonY
-    float buttonX, buttonWidth, buttonHeight;
+    float playAgainButtonY, exitButtonY, leaderboardButtonY, achievementsButtonY;
+    float buttonX, buttonWidth, buttonHeight, achievementsButtonX, achievementsButtonWidth, achievementsButtonHeight;
     float titleY;
     boolean exitFlag;
 
@@ -31,24 +31,28 @@ public class EndScreen implements Screen, InputProcessor {
     private void loadAssets() {
         playAgainButton = new Texture("end_gui/play_button.png");
         exitButton = new Texture("end_gui/exit_button.png");
-        leaderboardButton = new Texture("menu_gui/score_button.png"); // Make sure the asset exists
+        leaderboardButton = new Texture("menu_gui/score_button.png");
+        achievementsButton = new Texture("menu_buttons/menu_icon.png");
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
     }
 
     private void calculateDimensions() {
         buttonWidth = playAgainButton.getWidth() * 10 * game.scaleFactorX;
         buttonHeight = playAgainButton.getHeight() * 10 * game.scaleFactorY;
+        achievementsButtonWidth = buttonWidth * 0.5f;
+        achievementsButtonHeight = buttonHeight * 0.8f;
         font.getData().setScale(5.5f * game.scaleFactorX, 5.5f * game.scaleFactorY);
     }
 
     private void calculatePositions() {
         buttonX = (game.screenWidth - buttonWidth) / 2f;
+        achievementsButtonX = 30;
         playAgainButtonY = game.screenHeight - buttonHeight * 3.5f;
         leaderboardButtonY = game.screenHeight - buttonHeight * 5.0f;
         exitButtonY = game.screenHeight - buttonHeight * 6.5f;
+        achievementsButtonY = 50;
         titleY = game.screenHeight - 120f * game.scaleFactorY;
     }
-
 
     @Override
     public void render(float v) {
@@ -58,8 +62,9 @@ public class EndScreen implements Screen, InputProcessor {
         game.batch.begin();
         font.draw(game.batch, titleText, 0, titleY, game.screenWidth, Align.center, false);
         game.batch.draw(playAgainButton, buttonX, playAgainButtonY, buttonWidth, buttonHeight);
-        game.batch.draw(leaderboardButton, buttonX, leaderboardButtonY, buttonWidth, buttonHeight); // Draw leaderboard button
+        game.batch.draw(leaderboardButton, buttonX, leaderboardButtonY, buttonWidth, buttonHeight);
         game.batch.draw(exitButton, buttonX, exitButtonY, buttonWidth, buttonHeight);
+        game.batch.draw(achievementsButton, achievementsButtonX, achievementsButtonY, achievementsButtonWidth, achievementsButtonHeight);
         game.batch.end();
     }
 
@@ -81,6 +86,11 @@ public class EndScreen implements Screen, InputProcessor {
                 exitFlag = true;
                 dispose();
                 Gdx.app.exit();
+                return true;
+            } else if (touchX >= achievementsButtonX && touchX <= achievementsButtonX + achievementsButtonWidth &&
+                    touchY >= achievementsButtonY && touchY <= achievementsButtonY + achievementsButtonHeight) {
+                game.audio.buttonClickedSoundActivate();
+                game.screenManager.setScreen(ScreenType.ACHIEVEMENTS);
                 return true;
             }
         }

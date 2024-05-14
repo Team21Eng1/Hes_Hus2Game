@@ -515,6 +515,7 @@ public class MainGameScreen implements Screen, InputProcessor {
         }
         if (dayNum > 7)
         {
+            int score = EventManager.getScore(activities);
             game.screenManager.setScreen(ScreenType.LEADERBOARD);
             game.screenManager.setScreen(ScreenType.SAVE);
         }
