@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.main.Main;
+import com.main.gui.TextBox;
 import com.main.map.GameMap;
 import com.main.utils.CollisionHandler;
 
@@ -33,6 +36,9 @@ public class Student extends Entity {
     Texture sprSheet;
     public static int spriteX = 16;
     public static int spriteY = 16;
+    public boolean canInteract;
+    String disText;
+    public TextBox textBox;
 
 
     Animation<TextureRegion> walkDownAnimation, walkRightAnimation, walkLeftAnimation, walkUpAnimation;
@@ -57,14 +63,39 @@ public class Student extends Entity {
         setPath(pathKey);
 
         sprSheet = new Texture("character/NPCS.png");
+        int row = 0;
+        int[] frames = new int[] {0,1,2,1};
+        int skin = (int) Math.round(Math.random()*4);
+        switch (skin){
+            case 0:
+                row = 4;
+                break;
+            case 1:
+                frames = new int[] {3,4,5,4};
+                break;
+            case 2:
+                break;
+            case 3:
+                frames = new int[] {3,4,5,4};
+                row = 4;
+                break;
+            case 4:
+                row = 4;
+        }
 
-        walkDownAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},0,16,16,false));
-        walkLeftAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},1,16,16,false));
-        walkRightAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},2,16,16,false));
-        walkUpAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},3,16,16,false));
+        walkDownAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 0,16,16,false));
+        walkLeftAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 1,16,16,false));
+        walkRightAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 2,16,16,false));
+        walkUpAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 3,16,16,false));
 
 
     }
+    public void setTextBox(String text, int height, int width, BitmapFont font)
+    {
+        canInteract = true;
+        textBox = new TextBox(text,(int)worldX,(int)worldY+ 20,height,width,font);
+    }
+
 
 
     private float calcPathDst()
@@ -78,16 +109,18 @@ public class Student extends Entity {
         return totalDst;
     }
 
+
+
     public void update(float delta)
     {
+
+
         stateTime += delta;
         updatePath(delta);
+        if (canInteract) {textBox.setPosition((int)worldX,(int)worldY+spriteY+ 30);}
     }
     private void updatePath(float delta)
     {
-        //Gdx.app.log("X: ",Float.toString(worldX));
-        //Gdx.app.log("Y: ",Float.toString(worldY));
-        Gdx.app.log("dir: ", String.valueOf(dir));
         pathTime += delta*100;
         worldX = pathKey[currentKey].x + (pathKey[nextKey].x-pathKey[currentKey].x)*pathTime/(pathKey[currentKey].dst(pathKey[nextKey]));
         worldY = pathKey[currentKey].y + (pathKey[nextKey].y-pathKey[currentKey].y)*pathTime/(pathKey[currentKey].dst(pathKey[nextKey]));

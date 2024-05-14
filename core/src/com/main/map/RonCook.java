@@ -8,12 +8,11 @@ import com.main.Main;
 import com.main.entity.Entity;
 import com.main.entity.Player;
 import com.main.entity.Student;
-import com.main.utils.ScreenType;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class CS extends GameMap{
+public class RonCook extends GameMap{
     /**
      * Constructs a GameMap with an orthographic camera.
      *
@@ -23,11 +22,11 @@ public class CS extends GameMap{
     Student student;
     Player player;
     Main game;
-    public CS(Main game, OrthographicCamera camera) {
-        super(game,camera, "map/interior_maps/cs.tmx");
+    public RonCook(Main game, OrthographicCamera camera) {
+        super(game,camera, "map/interior_maps/roncooke.tmx");
         this.game = game;
         setRoom(camera);
-        activityScreen = ScreenType.TYPING_MINI_GAME;
+
     }
 
     public void setRoom(OrthographicCamera camera)
@@ -41,7 +40,7 @@ public class CS extends GameMap{
         entities.add(player);
         for (Entity e :entities) {
             e.collisionHandler.clearCollisionLayers();
-            e.collisionHandler.addCollisionLayers("computers","chairs");
+            e.collisionHandler.addCollisionLayers("tables","chairs");
         }
     }
     public void renderEntities(SpriteBatch batch){

@@ -41,7 +41,7 @@ public class TutorialScreen implements Screen, InputProcessor {
         loadTextures();
         calculateDimensions();
         calculatePositions();
-        tutorial = new TextBox("Welcome to Heslington Hustle here are some tips before you start playing",400,800,20,400,font,game.batch);
+        tutorial = new TextBox("Welcome to Heslington Hustle here are some tips before you start playing",400,800,20,400,font);
     }
 
     /**
@@ -83,7 +83,7 @@ public class TutorialScreen implements Screen, InputProcessor {
         game.batch.setProjectionMatrix(game.defaultCamera.combined);
 
         game.batch.begin();
-        tutorial.render();
+        tutorial.render(game.batch);
         game.batch.draw(playButton, x, playButtonY, playButtonWidth, playButtonHeight);
         game.batch.end();
     }

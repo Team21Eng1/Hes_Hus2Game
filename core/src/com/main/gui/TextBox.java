@@ -8,25 +8,29 @@ public class TextBox {
     private final String text;
     private final int height;
     private final int width;
-    private final SpriteBatch batch;
-    private final int xPos;
-    private final int yPos;
+    private int xPos;
+    private int yPos;
     BitmapFont font;
 
-    public TextBox(String text,int xPos,int yPos, int height, int width, BitmapFont font, SpriteBatch batch)
+    public TextBox(String text,int xPos,int yPos, int height, int width, BitmapFont font)
     {
         this.text = text;
         this.height = height;
         this.width = width;
         this.font = font;
-        this.batch = batch;
         this.xPos = xPos;
         this.yPos = yPos;
     }
-
-    public void render()
+    public void setPosition(int x,int y)
     {
-        font.draw(batch, text, xPos, yPos,width ,height,true);
+        xPos=x;
+        yPos=y;
+    }
+
+
+    public void render(SpriteBatch batch)
+    {
+        font.draw(batch, text, xPos, yPos,width ,height,false);
     }
 
 }

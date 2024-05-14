@@ -81,7 +81,7 @@ public class Pong implements Screen {
 
         exitButton.addListener(new ClickListener(){
             public void clicked (InputEvent event, float x, float y){
-                game.setScreen(new MainGameScreen(game));
+                game.screenManager.setScreen(ScreenType.GAME_SCREEN);
             }
         });
         stage.addActor(exitButton);
@@ -193,7 +193,7 @@ public class Pong implements Screen {
         if (ball.y - ball.radius < paddle.y) {
             resetBall();
             resetGame();
-            game.setScreen(new MainGameScreen(game));
+            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
 
         }
 

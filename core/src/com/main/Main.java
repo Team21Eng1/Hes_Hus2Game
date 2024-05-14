@@ -27,7 +27,8 @@ public class Main extends Game {
 	public OrthographicCamera defaultCamera;
 	public float scaleFactorX;
 	public float scaleFactorY;
-	public Game ScreenManager;
+
+	public BitmapFont font;
 
 	/**
 	 * Called when the game is first created.
@@ -51,7 +52,7 @@ public class Main extends Game {
 
 		// Fonts for writing in game
 		skin = new Skin();
-		BitmapFont font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
+		font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
 		skin.add("default-font", font, BitmapFont.class);
 		Label.LabelStyle labelStyle = new Label.LabelStyle();
 		labelStyle.font = font;
