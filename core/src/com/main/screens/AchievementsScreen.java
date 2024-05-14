@@ -22,7 +22,7 @@ public class AchievementsScreen implements Screen, InputProcessor {
     List<String[]> achievements;
     private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
-    private float titleY;
+    private float displayTextY, titleY;
 
     public AchievementsScreen(Main game) {
         this.game = game;
@@ -50,6 +50,7 @@ public class AchievementsScreen implements Screen, InputProcessor {
     private void calculatePositions() {
         backButtonX = (game.screenWidth - backButtonWidth) / 2f;
         backButtonY = game.screenHeight / 6f - 120 * game.scaleFactorY;
+        displayTextY = game.screenHeight / 2f;
         titleY = game.screenHeight - 100;
     }
 
@@ -66,6 +67,7 @@ public class AchievementsScreen implements Screen, InputProcessor {
         titleFont.draw(game.batch, "Achievements", 0, titleY, game.screenWidth, Align.center, false);
         float y = titleY - 200;
         game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
+        font.draw(game.batch, "Placeholder", 0, displayTextY, game.screenWidth, Align.center, false);
         game.batch.end();
     }
 

@@ -113,7 +113,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
         if (touchX >= backButtonX && touchX <= backButtonX + backButtonWidth &&
                 touchY >= backButtonY && touchY <= backButtonY + backButtonHeight) {
-            game.screenManager.setScreen(ScreenType.MAIN_MENU);
+            game.screenManager.setScreen(ScreenType.END_SCREEN);
             game.audio.buttonClickedSoundActivate();
         }
         return true;

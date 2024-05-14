@@ -101,7 +101,43 @@ public class EventManager {
         }
         return returns;
 
+    }
 
+    public static List<String> getAchievements(List<String> playedEvents) {
+        int eatCount = 0;
+        int exerciseCount = 0;
+        int studyCount = 0;
+        List<String> achievements = new ArrayList<>();
+
+        for (String event : playedEvents) {
+            switch (event.toLowerCase()) {
+                case "eat":
+                    eatCount++;
+                    break;
+                case "exercise":
+                    exerciseCount++;
+                    break;
+                case "study":
+                    studyCount++;
+                    break;
+            }
+        }
+
+        if (eatCount >= 25) {
+            achievements.add("Foodie - Completed the eat event 25 times");
+        }
+        if (exerciseCount >= 25) {
+            achievements.add("Gym Addict - Completed the exercise event 25 times");
+        }
+        if (studyCount >= 25) {
+            achievements.add("Bookworm - Completed the study event 25 times");
+        }
+
+        // Check if no achievements have been unlocked
+        if (achievements.isEmpty()) {
+            achievements.add("No achievements unlocked");
+        }
+
+        return achievements;
     }
 }
-

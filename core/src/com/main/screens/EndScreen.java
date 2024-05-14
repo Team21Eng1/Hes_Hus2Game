@@ -70,7 +70,8 @@ public class EndScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button) {
-        touchY = game.screenHeight - touchY;
+        touchY = game.screenHeight - touchY; // Convert the touch coordinates from screen to game's coordinate system.
+
         if (touchX >= buttonX && touchX <= buttonX + buttonWidth) {
             if (touchY >= playAgainButtonY && touchY <= playAgainButtonY + buttonHeight) {
                 game.audio.buttonClickedSoundActivate();
@@ -87,13 +88,17 @@ public class EndScreen implements Screen, InputProcessor {
                 dispose();
                 Gdx.app.exit();
                 return true;
-            } else if (touchX >= achievementsButtonX && touchX <= achievementsButtonX + achievementsButtonWidth &&
-                    touchY >= achievementsButtonY && touchY <= achievementsButtonY + achievementsButtonHeight) {
-                game.audio.buttonClickedSoundActivate();
-                game.screenManager.setScreen(ScreenType.ACHIEVEMENTS);
-                return true;
             }
         }
+
+        // Check the achievements button with its specific X coordinate and width.
+        if (touchX >= achievementsButtonX && touchX <= achievementsButtonX + achievementsButtonWidth &&
+                touchY >= achievementsButtonY && touchY <= achievementsButtonY + achievementsButtonHeight) {
+            game.audio.buttonClickedSoundActivate();
+            game.screenManager.setScreen(ScreenType.ACHIEVEMENTS);
+            return true;
+        }
+
         return false;
     }
     @Override

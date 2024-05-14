@@ -504,18 +504,20 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         // Ensure the hour cycles through the active hours correctly (8 AM to 12 AM)
         if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
-            if (dayNum == 7)
+            if (dayNum == 0)
             {
                 int score = EventManager.getScore(activities);
+                List<String> achievements = EventManager.getAchievements(activities);
                 game.screenManager.setScreen(ScreenType.LEADERBOARD);
                 game.screenManager.setScreen(ScreenType.SAVE);
 
             }
             resetDay();
         }
-        if (dayNum > 7)
+        if (dayNum > 0)
         {
             int score = EventManager.getScore(activities);
+            List<String> achievements = EventManager.getAchievements(activities);
             game.screenManager.setScreen(ScreenType.LEADERBOARD);
             game.screenManager.setScreen(ScreenType.SAVE);
         }
