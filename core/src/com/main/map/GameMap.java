@@ -1,7 +1,9 @@
 package com.main.map;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.main.Main;
 import com.main.entity.Entity;
+import com.main.utils.ScreenType;
 
 import java.util.ArrayList;
 
@@ -24,8 +27,10 @@ public class GameMap extends TiledMap {
     private final OrthographicCamera camera;
     int tileSize = 16;
     float layerToggleTime;
+    public ScreenType activityScreen;
 
     ArrayList<Entity> entities;
+    BitmapFont font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
 
 
     /**

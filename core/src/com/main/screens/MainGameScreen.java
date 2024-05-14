@@ -1,9 +1,6 @@
 package com.main.screens;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,9 +18,11 @@ import com.main.entity.Entity;
 import com.main.entity.Player;
 
 import com.main.entity.Student;
+import com.main.map.Accom;
 import com.main.map.CS;
 
 import com.main.map.GameMap;
+import com.main.map.Piazza;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
 import com.main.utils.EventManager;
@@ -41,7 +40,7 @@ public class MainGameScreen implements Screen, InputProcessor {
     private final Color shader;
     private final float zoom = 3f;
     private final Player player;
-    private final BitmapFont font, popupFont, durationFont;
+    public final BitmapFont font, popupFont, durationFont;
     private final GameMap gameMap;
     private final OrthographicCamera camera;
     private final ShapeRenderer shapeRenderer;
@@ -73,9 +72,9 @@ public class MainGameScreen implements Screen, InputProcessor {
     private List<String> activities = new ArrayList<>();
 
 
-    private Student student;
+    private Student student1,student2,student3;
     float timer,t;
-    public GameMap roomMap;
+    public GameMap roomMap,studyRoom;
 
     /**
      * Constructs the main game screen with necessary game components.
@@ -120,8 +119,12 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.player = new Player(this.game, this.gameMap, this.camera);
 
 
-        this.student = new Student(this.gameMap,1500,600);
-        this.student.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
+        this.student1 = new Student(this.gameMap,1500,600);
+        this.student1.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
+        this.student2 = new Student(this.gameMap,1650,1400);
+        this.student2.setPath(new Vector2[] {new Vector2(1650,1400),new Vector2(1660,650),new Vector2(1080,650),new Vector2(1080,930)});
+        this.student3 = new Student(this.gameMap,1500,600);
+        this.student3.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
 
 
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -327,10 +330,10 @@ public class MainGameScreen implements Screen, InputProcessor {
                 popupVisible = true;
                 break;
             case "Piazza_door":
-                drawMenuOption(player.worldX + 30, player.worldY + 20, "Study", 0);
-                drawMenuOption(player.worldX + 30, player.worldY + 35, "Eat", 0);
-                popupVisible = true;
-                break;
+//                drawMenuOption(player.worldX + 30, player.worldY + 20, "Study", 0);
+//                drawMenuOption(player.worldX + 30, player.worldY + 35, "Eat", 0);
+//                popupVisible = true;
+//                break;
             case "Gym_door":
                 drawMenuOption(player.worldX + 30, player.worldY + 20, "Exercise", 0);
                 popupVisible = true;
@@ -434,6 +437,14 @@ public class MainGameScreen implements Screen, InputProcessor {
         updateRoom(delta);
         if (roomMap != null)
         {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0, 0, 0, 1); // Adjust alpha for darkness
+            shapeRenderer.rect(0, 0, gameMap.getWidth(), gameMap.getHeight());
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
             roomCam.position.x = roomMap.getWidth()/2;
             roomCam.position.y = roomMap.getHeight()/2;
 
@@ -449,10 +460,23 @@ public class MainGameScreen implements Screen, InputProcessor {
         {
             timer = 10;
             t=0;
-        } else {
+        }else if (roomMap instanceof Piazza)
+        {
+            if (((Piazza) roomMap).interact()) {
+                if (roomMap.activityScreen != null) {game.screenManager.setScreen(roomMap.activityScreen,duration); }
+                roomMap = null;
+                lockMovement = false;
+
+            }
+        }
+        else {
             t+= delta;
             if (t>timer)
             {
+                if (activity == "sleep") {
+                    resetDay();
+                } else{game.screenManager.setScreen(roomMap.activityScreen,duration);}
+
                 roomMap = null;
                 lockMovement = false;
             }
@@ -467,11 +491,15 @@ public class MainGameScreen implements Screen, InputProcessor {
     {
         int sX = Player.spriteX;
         game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
-        game.batch.draw(student.getCurrentFrame(),student.worldX,student.worldY,Student.spriteX,Student.spriteY);
+        game.batch.draw(student1.getCurrentFrame(),student1.worldX,student1.worldY,Student.spriteX,Student.spriteY);
+        game.batch.draw(student2.getCurrentFrame(),student2.worldX,student2.worldY,Student.spriteX,Student.spriteY);
+        game.batch.draw(student3.getCurrentFrame(),student3.worldX,student3.worldY,Student.spriteX,Student.spriteY);
     }
     private void updateEntities(float delta)
     {
-        student.update(delta);
+        student1.update(delta);
+        student2.update(delta);
+        student3.update(delta);
     }
 
 
@@ -480,7 +508,7 @@ public class MainGameScreen implements Screen, InputProcessor {
      * Renders the UI elements of the game.
      */
     private void drawUIElements(){
-        String counterString = String.format("Recreation Activities done: " + recActivity + "\nStudy hours: " + studyHours + "\nMeals Eaten: " + mealCount, dayNum, timeElapsed );
+        String counterString = String.format("Recreation Activities done: " + recActivity + "\nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
         game.batch.setProjectionMatrix(game.defaultCamera.combined);
         if (showMenu) drawDurationMenu();
         game.batch.begin();
@@ -507,6 +535,8 @@ public class MainGameScreen implements Screen, InputProcessor {
             if (dayNum == 7)
             {
                 int score = EventManager.getScore(activities);
+                Gdx.app.log("score: ", String.valueOf(score));
+                Gdx.app.log("Acts: ", String.valueOf(activities));
                 game.screenManager.setScreen(ScreenType.LEADERBOARD);
                 game.screenManager.setScreen(ScreenType.END_SCREEN);
 
@@ -602,10 +632,10 @@ public class MainGameScreen implements Screen, InputProcessor {
                         energyBar.dispose();
                         energyBar = setEnergyBar();
                         timeElapsed += duration * secondsPerGameHour;
-                        game.screenManager.setScreen(ScreenType.TYPING_MINI_GAME, duration);
-
-                        roomMap = new CS(this.game,roomCam,"map/interior_maps/library.tmx");
+                        roomMap = studyRoom;
                         lockMovement = true;
+
+
                     }
                     break;
 
@@ -656,7 +686,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         lockMovement = fadeOut;
                         resetDay();
                         duration = 1;
-                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
+
                     }
                     break;
                 case "eat":
@@ -676,7 +706,7 @@ public class MainGameScreen implements Screen, InputProcessor {
                         showMenu = false;
                         lockMovement = fadeOut;
                         mealCount++;
-                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
+
                     }
                     break;
             }
@@ -693,34 +723,41 @@ public class MainGameScreen implements Screen, InputProcessor {
                         activity = "study";
                         activities.add(activity);
                         duration = 1;
+                        studyRoom = new CS(this.game,roomCam);
+                        lockMovement = true;
                     }
                     break;
 
                 case "Piazza_door":
-                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = true;
-                        lockMovement = true;
-                        activity = "study";
-                        activities.add(activity);
-                        duration = 1;
-
-                    }
-                    else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
-                        game.audio.buttonClickedSoundActivate();
-                        game.audio.eatingSoundActivate();
-                        energyCounter += 3;
-                        mealCount++;
-                        if (energyCounter > 10) energyCounter = 10;
-                        energyBar.dispose();
-                        energyBar = setEnergyBar();
-                        activities.add("eat");
-                        showMenu = false;
-                        lockMovement = true;
-                        activity = "eat";
-                        duration = 1;
-                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
-                    }
+                    roomMap = new Piazza(this.game,roomCam);
+                    lockMovement = true;
+//                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
+//                        game.audio.buttonClickedSoundActivate();
+//                        showMenu = true;
+//                        lockMovement = true;
+//                        activity = "study";
+//                        activities.add(activity);
+//                        duration = 1;
+//                        studyRoom = new Piazza(this.game,roomCam,"study");
+//                        lockMovement = true;
+//
+//                    }
+//                    else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
+//                        game.audio.buttonClickedSoundActivate();
+//                        game.audio.eatingSoundActivate();
+//                        energyCounter += 3;
+//                        mealCount++;
+//                        if (energyCounter > 10) energyCounter = 10;
+//                        energyBar.dispose();
+//                        energyBar = setEnergyBar();
+//                        activities.add("eat");
+//                        showMenu = false;
+//                        lockMovement = true;
+//                        activity = "eat";
+//                        duration = 1;
+//                        roomMap = new Piazza(this.game,roomCam,activity);
+//                        lockMovement = true;
+//                    }
                     break;
 
                 case "Gym_door":
@@ -742,6 +779,8 @@ public class MainGameScreen implements Screen, InputProcessor {
                         activity = "sleep";
                         duration = 1;
                         activities.add(activity);
+                        roomMap = new Accom(this.game,roomCam);
+                        lockMovement = true;
                     }
                     break;
             }
@@ -793,6 +832,13 @@ public class MainGameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int i) {
+        if (i == Input.Keys.SPACE)
+        {
+            if (getDoorTouching() == "Piazza_door") {
+                roomMap = new Piazza(game,roomCam);
+                lockMovement = true;
+            }
+        }
         return false;
     }
 

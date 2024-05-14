@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
+import com.main.utils.ScreenType;
 
 import java.security.AlgorithmConstraints;
 
@@ -80,7 +81,7 @@ public class snakegame implements Screen {
 
         exitButton.addListener(new ClickListener(){
             public void clicked (InputEvent event, float x, float y){
-                game.setScreen(new MainGameScreen(game));
+                game.screenManager.setScreen(ScreenType.GAME_SCREEN);
             }
         });
         stage.addActor(exitButton);
@@ -199,7 +200,7 @@ public class snakegame implements Screen {
                 break;
         }
         if (checkCollision(head)) {
-            game.setScreen(new MainGameScreen(game));
+            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
         } else {
             snake.insert(0, head);
 

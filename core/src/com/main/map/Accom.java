@@ -13,7 +13,7 @@ import com.main.utils.ScreenType;
 import java.io.File;
 import java.util.ArrayList;
 
-public class CS extends GameMap{
+public class Accom extends GameMap{
     /**
      * Constructs a GameMap with an orthographic camera.
      *
@@ -23,16 +23,17 @@ public class CS extends GameMap{
     Student student;
     Player player;
     Main game;
-    public CS(Main game, OrthographicCamera camera) {
-        super(game,camera, "map/interior_maps/cs.tmx");
+    public Accom(Main game, OrthographicCamera camera) {
+        super(game,camera, "map/interior_maps/goodrickeaccom .tmx");
         this.game = game;
         setRoom(camera);
-        activityScreen = ScreenType.TYPING_MINI_GAME;
+        activityScreen = null;
+
     }
 
     public void setRoom(OrthographicCamera camera)
     {
-        player = new Player(game,(GameMap) this, camera);
+        player = new Player(game,this, camera);
         player.camFollow = false;
         student = new Student((GameMap) this, 50,50);
         student.setPath(new Vector2[] {new Vector2(50,50),new Vector2(100,50),new Vector2(100,100)});
@@ -41,7 +42,7 @@ public class CS extends GameMap{
         entities.add(player);
         for (Entity e :entities) {
             e.collisionHandler.clearCollisionLayers();
-            e.collisionHandler.addCollisionLayers("computers","chairs");
+            e.collisionHandler.addCollisionLayers("floor");
         }
     }
     public void renderEntities(SpriteBatch batch){

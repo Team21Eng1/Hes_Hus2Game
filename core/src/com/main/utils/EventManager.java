@@ -72,7 +72,7 @@ public class EventManager {
             }
         }
 
-        return (int)((score / 692)* 10);
+        return (int)((score));
     }
 
     public static List<Integer> getStreak(List<List<String>> locDays, String event)
