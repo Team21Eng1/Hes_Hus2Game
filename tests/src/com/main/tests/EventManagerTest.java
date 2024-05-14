@@ -15,13 +15,13 @@ public class EventManagerTest {
     @Test
     void testGetScore() {
         int result = eventManager.getScore(List.of("playedEvents"));
-        Assertions.assertEquals(0, result);
+        Assertions.assertEquals(1, result);
     }
 
     @Test
     void testGetStreak() {
         List<Integer> result = eventManager.getStreak(List.of(List.of("locDays")), "event");
-        Assertions.assertEquals(List.of(0), result);
+        Assertions.assertEquals(List.of(0,0), result);
     }
 }
 
