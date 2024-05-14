@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.main.Main;
 import com.main.map.GameMap;
@@ -17,12 +18,10 @@ public class Student extends Entity {
     Main game;
     GameMap gameMap;
     OrthographicCamera camera;
-    CollisionHandler collisionHandler;
+
 
     char dir; // Current direction of the player
     public static final float animation_speed = 0.1f; // speed that sprite will animate or frame duration
-    public static final int spriteX = 16;// this is in reference to the sprite sheet
-    public static final int spriteY = 16;
     int tileSize;
 
     private Vector2[] pathKey;
@@ -32,37 +31,39 @@ public class Student extends Entity {
 
     public float startX, startY;
     Texture sprSheet;
+    public static int spriteX = 16;
+    public static int spriteY = 16;
+
 
     Animation<TextureRegion> walkDownAnimation, walkRightAnimation, walkLeftAnimation, walkUpAnimation;
     Animation<TextureRegion> idleDownAnimation, idleRightAnimation, idleLeftAnimation, idleUpAnimation;
 
-    public Student(Main game, GameMap gameMap)
+    public Student(GameMap gameMap,int startX, int startY)
     {
-        this.game = game;
         this.gameMap = gameMap;
+
+
 
         tileSize = gameMap.getTileSize();
         this.collisionHandler = new CollisionHandler(gameMap.getMap(), tileSize, tileSize, spriteX, spriteY * 0.5f, 0.7f, 0.7f);
         this.collisionHandler.addCollisionLayers("Trees", "wall_1", "wall_2", "wall_3", "roof_1", "roof_2", "roof_3", "other", "lilipads");
 
         this.speed = 200;
-        startX = 1500;
-        startY = 600;
         worldX = startX;
         worldY = startY;
 
-        pathKey = new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)};
-        pathDst = calcPathDst();
+
+        pathKey = new Vector2[] {new Vector2(0,0),new Vector2(0,0)};
+        setPath(pathKey);
 
         sprSheet = new Texture("character/NPCS.png");
-        Stream.concat(Arrays.stream(getFrames(sprSheet, 0, 2, 0, 16, 16, 0, 0, 0, 0, false)), Arrays.stream(getFrames(sprSheet, 0, 2, 0, 16, 16, 0, 0, 0, 0, false))).toArray();
 
         walkDownAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},0,16,16,false));
         walkLeftAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},1,16,16,false));
         walkRightAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},2,16,16,false));
         walkUpAnimation = new Animation<>(animation_speed, getFrames(sprSheet,new int[] {0,1,2,1},3,16,16,false));
 
-        setDir(pathKey[currentKey],pathKey[nextKey]);
+
     }
 
 
@@ -103,7 +104,10 @@ public class Student extends Entity {
 
 
     public void setPath(Vector2[] keyP){
+
         pathKey = keyP;
+        pathDst = calcPathDst();
+        setDir(pathKey[currentKey],pathKey[nextKey]);
     }
     public void setDir(Vector2 v1, Vector2 v2)
     {
@@ -130,6 +134,17 @@ public class Student extends Entity {
         }
 
     }
+    @Override
+    public int getSpriteX()
+    {
+        return spriteX;
+    }
+    @Override
+    public int getSpriteY()
+    {
+        return spriteY;
+    }
+
 
 
 }

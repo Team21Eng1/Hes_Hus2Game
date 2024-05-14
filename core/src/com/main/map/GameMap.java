@@ -1,11 +1,17 @@
 package com.main.map;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.main.Main;
+import com.main.entity.Entity;
+
+import java.util.ArrayList;
 
 /**
  * Represents the game map, handling rendering and toggling layer visibility.
@@ -19,21 +25,24 @@ public class GameMap extends TiledMap {
     int tileSize = 16;
     float layerToggleTime;
 
+    ArrayList<Entity> entities;
+
+
     /**
      * Constructs a GameMap with an orthographic camera.
      *
      * @param camera The camera used to view the map.
      */
-    public GameMap(OrthographicCamera camera) {
+    public GameMap(Main game, OrthographicCamera camera, String fileName) {
         // Load the .tmx with the MainMap for game
-        gameMap = new TmxMapLoader().load("map/MainMap.tmx");
+        gameMap = new TmxMapLoader().load(fileName);
         MapProperties properties = gameMap.getProperties();
         height = properties.get("tileheight", Integer.class) * properties.get("height", Integer.class);
         width = properties.get("tilewidth", Integer.class) * properties.get("width", Integer.class);
 
         // Render the MainMap
         tiledMapRenderer = new OrthogonalTiledMapRenderer(gameMap);
-
+        entities = new ArrayList<Entity>();
         this.camera = camera;
     }
 
@@ -62,6 +71,12 @@ public class GameMap extends TiledMap {
             layerToggleTime = 0;
         }
     }
+
+    public void renderEntities(SpriteBatch batch)
+    {
+
+    }
+
 
     /**
      * Toggles the visibility of a specific layer within the map.

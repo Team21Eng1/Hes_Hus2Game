@@ -11,5 +11,7 @@ public enum ScreenType {
     MINI_GAME,
     END_SCREEN,
     LEADERBOARD,
-    SAVE
+    HEAD,
+    SAVE,
+    TUTORIAL
 }

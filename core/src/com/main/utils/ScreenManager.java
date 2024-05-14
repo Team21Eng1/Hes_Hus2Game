@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.main.Main;
 import com.main.screens.*;
 
+import javax.swing.plaf.BorderUIResource;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -108,6 +109,8 @@ public class ScreenManager {
                 return new LeaderboardScreen(game);
             case SAVE:
                 return new SaveScreen(game);
+            case TUTORIAL:
+                return new TutorialScreen(game);
         }
         return null;
     }
