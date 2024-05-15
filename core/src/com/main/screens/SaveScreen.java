@@ -30,6 +30,7 @@ public class SaveScreen implements Screen, InputProcessor {
         calculatePositions();
         Gdx.input.setInputProcessor(this);
         titleFont.getData().setScale(3.0f * game.scaleFactorX, 3.0f * game.scaleFactorY);
+        score = game.screenManager.getScore();
     }
 
     private void calculateDimensions() {
@@ -54,7 +55,7 @@ public class SaveScreen implements Screen, InputProcessor {
     public void render(float delta) {
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.begin();
-        titleFont.draw(game.batch, "Save score of: " + this.score, 0, titleY, game.screenWidth, Align.center, false);
+        titleFont.draw(game.batch, "Save score of: " + score, 0, titleY, game.screenWidth, Align.center, false);
         if (acceptInput) {
             font.draw(game.batch, "Input username: " + username, 0, displayTextY, game.screenWidth, Align.center, false);
         }

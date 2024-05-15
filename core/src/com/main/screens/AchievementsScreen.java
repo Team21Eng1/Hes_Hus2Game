@@ -7,19 +7,17 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.files.FileHandle;
 import com.main.Main;
+import com.main.utils.EventManager;
+import com.main.utils.ScreenManager;
 import com.main.utils.ScreenType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class AchievementsScreen implements Screen, InputProcessor {
     Main game;
     BitmapFont font, titleFont;
-    List<String[]> achievements;
+    List<String> achievements;
     private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
     private float displayTextY, titleY;
@@ -29,16 +27,11 @@ public class AchievementsScreen implements Screen, InputProcessor {
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         titleFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         backButton = new Texture("settings_gui/back_button.png");
-        achievements = new ArrayList<>();
-//        loadAchievements();
+        achievements = game.screenManager.getAchievements();
 
         calculateDimensions();
         calculatePositions();
         titleFont.getData().setScale(3.0f * game.scaleFactorX, 3.0f * game.scaleFactorY);
-    }
-
-    private void loadAchievements() {
-//        Placeholder
     }
 
     private void calculateDimensions() {
@@ -50,7 +43,7 @@ public class AchievementsScreen implements Screen, InputProcessor {
     private void calculatePositions() {
         backButtonX = (game.screenWidth - backButtonWidth) / 2f;
         backButtonY = game.screenHeight / 6f - 120 * game.scaleFactorY;
-        displayTextY = game.screenHeight / 2f;
+        displayTextY = game.screenHeight / 2f - 200;
         titleY = game.screenHeight - 100;
     }
 
@@ -65,22 +58,16 @@ public class AchievementsScreen implements Screen, InputProcessor {
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.begin();
         titleFont.draw(game.batch, "Achievements", 0, titleY, game.screenWidth, Align.center, false);
-        float y = titleY - 200;
+        float y = displayTextY;
+        for (String achievement : achievements) {
+            font.draw(game.batch, achievement, 0, y, game.screenWidth, Align.center, false);
+            y -= font.getLineHeight() + 20;
+        }
         game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
-        font.draw(game.batch, "Placeholder", 0, displayTextY, game.screenWidth, Align.center, false);
         game.batch.end();
     }
 
-    /**
-     * Handles touch down input events. Specifically, checks if the back button is pressed
-     * and navigates back to the main menu screen.
-     *
-     * @param touchX The x-coordinate of the touch, in screen coordinates.
-     * @param touchY The y-coordinate of the touch, in screen coordinates.
-     * @param pointer The pointer for the event.
-     * @param button The button pressed.
-     * @return true if the event was handled, false otherwise.
-     */
+    @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button) {
         touchY = (game.screenHeight - touchY);
 

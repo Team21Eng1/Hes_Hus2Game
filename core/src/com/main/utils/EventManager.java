@@ -126,10 +126,10 @@ public class EventManager {
         if (eatCount >= 25) {
             achievements.add("Foodie - Completed the eat event 25 times");
         }
-        if (exerciseCount >= 25) {
+        if (exerciseCount >= 10) {
             achievements.add("Gym Addict - Completed the exercise event 25 times");
         }
-        if (studyCount >= 25) {
+        if (studyCount >= 10) {
             achievements.add("Bookworm - Completed the study event 25 times");
         }
 
