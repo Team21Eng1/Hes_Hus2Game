@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 
 public class TextBox {
-    private final String text;
+    public String text;
     private final int height;
     private final int width;
     private int xPos;
@@ -20,7 +20,13 @@ public class TextBox {
         this.font = font;
         this.xPos = xPos;
         this.yPos = yPos;
+        font.getData().setScale(1);
     }
+    public void scaleFont(float scale)
+    {
+        font.getData().setScale(scale);
+    }
+
     public void setPosition(int x,int y)
     {
         xPos=x;
@@ -30,7 +36,12 @@ public class TextBox {
 
     public void render(SpriteBatch batch)
     {
-        font.draw(batch, text, xPos, yPos,width ,height,false);
+        font.draw(batch, text, xPos, yPos);
     }
 
+    public void Centre()
+    {
+        xPos = (int) (xPos - width/2);
+        yPos = (int) (yPos - height/2);
+    }
 }

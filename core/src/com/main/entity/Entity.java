@@ -13,9 +13,27 @@ public class Entity extends Sprite {
     public float worldX, worldY;
     public static int spriteX;// this is in reference to the sprite sheet
     public static int spriteY;
+    public char dir;
     public float speed; // walking speed per frame
     public Animation<TextureRegion> currentAnimation;
     public float stateTime; // Tracks animation time
+    public Boolean loop = true;
+    public Boolean isMoving = false;
+    public Entity(int startX,int startY)
+    {
+        worldX = startX;
+        worldY = startY;
+        this.dir = 'D';
+    }
+    public void setMoving(Boolean bool)
+    {
+        this.isMoving = bool;
+    }
+    public void setDir(char newDir)
+    {
+        this.dir = newDir;
+    }
+
 
     public TextureRegion[] getFrames(Texture sprSheet, int start, int end, int row, int width, int height, int gutX, int gutY, int marX, int marY, boolean flip)
     {
@@ -61,7 +79,7 @@ public class Entity extends Sprite {
     }
 
     public TextureRegion getCurrentFrame(){
-        return currentAnimation.getKeyFrame(stateTime, true);
+        return currentAnimation.getKeyFrame(stateTime, this.loop);
     }
 
     public void update(float delta) {

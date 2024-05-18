@@ -8,6 +8,7 @@ import com.main.Main;
 import com.main.entity.Entity;
 import com.main.entity.Player;
 import com.main.entity.Student;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
 import java.io.File;
@@ -21,7 +22,6 @@ public class Piazza extends GameMap{
      * @param Filename
      */
     Student student1,student2;
-    Player player;
     Main game;
 
     public Piazza(Main game, OrthographicCamera camera) {
@@ -44,14 +44,12 @@ public class Piazza extends GameMap{
     }
     public void setRoom(OrthographicCamera camera)
     {
-        player = new Player(game, this, camera);
-        player.setPos(80,20);
+        player = new Player(game, this, camera,80,20);
         player.camFollow = false;
         student1 = new Student((GameMap) this, 200,200);
-        student1.setPath(new Vector2[] {new Vector2(50,240),new Vector2(80,240)});
-        student1.setTextBox("hi", 10,50, font);
-        student2 = new Student((GameMap) this, 400,100);
-        student2.setPath(new Vector2[] {new Vector2(250,100),new Vector2(290,100)});
+        student1.setTextBox("eat?", 10,50, font);
+        student2 = new Student((GameMap) this, 50,100);
+        student2.setTextBox("study?", 10,50, font);
         entities.add(student1);
         entities.add(student2);
 
@@ -78,11 +76,11 @@ public class Piazza extends GameMap{
         {
             if (e == student1)
             {
-                activityScreen = ScreenType.SNAKE_MINI_GAME;
+                activity = ActivityType.EAT;
                 return true;
             } else if (e==student2)
             {
-                activityScreen = ScreenType.PONG_MINI_GAME;
+                activity = ActivityType.STUDY;
                 return true;
             }
         }
@@ -102,7 +100,7 @@ public class Piazza extends GameMap{
     {
         if (new Vector2(player.worldX,player.worldY).dst(80,0) < 10)
         {
-            activityScreen = null;
+            activity = ActivityType.EXIT;
             return true;
         }else return false;
     }
@@ -111,7 +109,13 @@ public class Piazza extends GameMap{
     {
 
         for (Entity e :entities) {
-            e.update(delta);
+            if (e instanceof Player)
+            {
+                if (!lockMovement){e.update(delta);}
+            } else {
+                e.update(delta);
+            }
+
         }
     }
 

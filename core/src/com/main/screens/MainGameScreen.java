@@ -1,34 +1,27 @@
 package com.main.screens;
-
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
-import com.main.entity.Entity;
 import com.main.entity.Player;
 
 import com.main.entity.Student;
-import com.main.map.Accom;
-import com.main.map.CS;
+import com.main.map.*;
 
-import com.main.map.GameMap;
-import com.main.map.Piazza;
+import com.main.utils.ActivityType;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
 import com.main.utils.EventManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.main.gui.GUI;
 
 /**
  * The MainGameScreen class is responsible for rendering and updating all the game elements
@@ -40,41 +33,31 @@ public class MainGameScreen implements Screen, InputProcessor {
     private final Color shader;
     private final float zoom = 3f;
     private final Player player;
-    public final BitmapFont font, popupFont, durationFont;
+    public final BitmapFont font;
     private final GameMap gameMap;
-    private final OrthographicCamera camera;
+    private final OrthographicCamera camera, roomCam, guiCam;
     private final ShapeRenderer shapeRenderer;
     private final Main game;
-    private final Texture menuButton, popupMenu, durationUpButton, durationDownButton,
-            menuBackButton, menuStudyButton, menuSleepButton, menuGoButton,
-            durationMenuBackground, counterBackground;
     private final float gameDayLengthInSeconds;
     private final float secondsPerGameHour;
-    private final OrthographicCamera roomCam;
+
 
     // Non-final attributes
-    private Texture energyBar;
-    private float menuButtonY, menuButtonX, menuButtonWidth, menuButtonHeight;
-    private float counterBackgroundY, counterBackgroundX, counterBackgroundWidth, counterBackgroundHeight;
-    private float popupMenuWidth, popupMenuHeight;
-    private float durationUpButtonX, durationDownButtonX, durationMenuBackgroundX, durationButtonY, durationMenuBackgroundY;
-    private float durationUpButtonWidth, durationDownButtonWidth, durationMenuBackgroundWidth, durationUpButtonHeight, durationDownButtonHeight, durationMenuBackgroundHeight;
-    private float menuBackButtonWidth, menuBackButtonHeight, activityButtonWidth, activityButtonHeight;
-    private float menuBackButtonX, activityButtonX, durationMenuButtonY;
-    private float durationTextY, menuTitleY, hoursLabelY;
-    private float energyBarY, energyBarX, energyBarWidth, energyBarHeight;
-    private String activity, popupMenuType;
+    private String activity;
     private int energyCounter, duration, dayNum, recActivity, studyHours, mealCount, currentHour;
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
+    private GUI gui;
 
 
     private List<String> activities = new ArrayList<>();
 
 
     private Student student1,student2,student3;
-    float timer,t;
-    public GameMap roomMap,studyRoom;
+    private boolean space;
+    private float energyMax, energy;
+    public GameMap roomMap,csRoom,piaRoom,accomRoom,gymRoom;
+
 
     /**
      * Constructs the main game screen with necessary game components.
@@ -88,22 +71,8 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.gameDayLengthInSeconds = 60f;
         this.secondsPerGameHour = this.gameDayLengthInSeconds / 16; // Assuming 16 hours in a day
 
-        // Initialize final Texture objects
-        this.menuButton = new Texture("menu_buttons/menu_icon.png");
-        this.counterBackground = new Texture("counter_background.png");
-        this.popupMenu = new Texture("popup_menu.png");
-        this.durationMenuBackground = new Texture("duration_menu_background.png");
-        this.durationUpButton = new Texture("settings_gui/arrow_right_button.png");
-        this.durationDownButton = new Texture("settings_gui/arrow_left_button.png");
-        this.menuBackButton = new Texture("settings_gui/back_button.png");
-        this.menuStudyButton = new Texture("study_button.png");
-        this.menuSleepButton = new Texture("sleep_button.png");
-        this.menuGoButton = new Texture("go_button.png");
-
         // Initialize non-final attributes
         this.activity = "";
-        this.popupMenuType = "";
-        this.energyCounter = 10;
         this.duration = 1;
         this.dayNum = 1;
         this.timeElapsed = 0f;
@@ -115,8 +84,11 @@ public class MainGameScreen implements Screen, InputProcessor {
         // Setting up the game
         this.camera = new OrthographicCamera();
         this.roomCam = new OrthographicCamera();
+        this.guiCam = new OrthographicCamera();
+
         this.gameMap = new GameMap(this.game,this.camera,"map/MainMap.tmx");
-        this.player = new Player(this.game, this.gameMap, this.camera);
+        this.player = new Player(this.game, this.gameMap, this.camera,1500,600);
+        this.gui = new GUI(this.game,this.guiCam,this.zoom);
 
 
         this.student1 = new Student(this.gameMap,1500,600);
@@ -124,81 +96,71 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.student2 = new Student(this.gameMap,1650,1400);
         this.student2.setPath(new Vector2[] {new Vector2(1650,1400),new Vector2(1660,650),new Vector2(1080,650),new Vector2(1080,930)});
         this.student3 = new Student(this.gameMap,1500,600);
-        this.student3.setPath(new Vector2[] {new Vector2(1500,600),new Vector2(1600,600),new Vector2(1600,500),new Vector2(1700,800)});
 
 
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        this.popupFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        this.durationFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.shapeRenderer = new ShapeRenderer();
-        this.energyBar = setEnergyBar();
 
-        this.calculateDimensions();
-        this.calculatePositions();
-        this.popupFont.getData().setScale(0.4f, 0.4f);
         this.player.setPos(1389, 635);
         this.camera.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
         this.roomCam.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
+        this.guiCam.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
         this.camera.update();
         this.roomCam.update();
+        this.guiCam.update();
 
         roomMap = null;
+
+        csRoom = new CS(this.game,this.roomCam);
+        accomRoom = new Accom(this.game,this.roomCam);
+        piaRoom = new Piazza(this.game,this.roomCam);
+        gymRoom = new RonCook(this.game,this.roomCam);
+
+        space = false;
+
+        this.energyMax = 100f;
+        this.energy = 100f;
     }
-
-
-    private void calculateDimensions(){
-        menuButtonWidth = 64 * game.scaleFactorX;
-        menuButtonHeight = 64 * game.scaleFactorY;
-        energyBarWidth = 200 * game.scaleFactorX;
-        energyBarHeight = 64 * game.scaleFactorY;
-        counterBackgroundWidth = 370 * game.scaleFactorX;
-        counterBackgroundHeight = 150 * game.scaleFactorY;
-        durationUpButtonWidth = 50 * game.scaleFactorX;
-        durationUpButtonHeight = 50 * game.scaleFactorY;
-        durationDownButtonWidth = 50 * game.scaleFactorX;
-        durationDownButtonHeight = 50 * game.scaleFactorY;
-        durationMenuBackgroundWidth = 500 * game.scaleFactorX;
-        durationMenuBackgroundHeight = 500 * game.scaleFactorY;
-        menuBackButtonWidth = 150 * game.scaleFactorX;
-        menuBackButtonHeight = 75 * game.scaleFactorY;
-        activityButtonWidth = 150 * game.scaleFactorX;
-        activityButtonHeight = 75 * game.scaleFactorY;
-        popupMenuWidth = 35;
-        popupMenuHeight = 10;
-        font.getData().setScale(game.scaleFactorX, game.scaleFactorY);
-        durationFont.getData().setScale(3f * game.scaleFactorX, 3f * game.scaleFactorY);
-
-    }
-
-    private void calculatePositions(){
-        menuButtonX = 10 * game.scaleFactorX;
-        menuButtonY = game.screenHeight - menuButtonHeight - 10 * game.scaleFactorY;
-        energyBarX = 30 * game.scaleFactorX + menuButtonWidth;
-        energyBarY = game.screenHeight - energyBarHeight - 10 * game.scaleFactorY;
-        counterBackgroundX = game.screenWidth - counterBackgroundWidth;
-        counterBackgroundY = game.screenHeight - counterBackgroundHeight;
-        durationMenuBackgroundX = game.screenWidth/2f - durationMenuBackgroundWidth/2f;
-        durationMenuBackgroundY = game.screenHeight/2f - durationMenuBackgroundHeight/2f;
-        durationDownButtonX = game.screenWidth/2f - durationDownButtonWidth/2f - 150 * game.scaleFactorX;
-        durationUpButtonX = game.screenWidth/2f - durationUpButtonWidth/2f + 150 * game.scaleFactorX;
-        durationButtonY = game.screenHeight/2f - durationUpButtonHeight/2f - 60 * game.scaleFactorY;
-        menuBackButtonX = durationDownButtonX;
-        activityButtonX = durationUpButtonX + durationUpButtonWidth - activityButtonWidth;
-        durationMenuButtonY = durationButtonY - 125 * game.scaleFactorY;
-        menuTitleY = 730 * game.scaleFactorY;
-        durationTextY = 503 * game.scaleFactorY;
-        hoursLabelY = 580 * game.scaleFactorY;
+    public void updateEnergy(float delta)
+    {
+        Player locPlay;
+        if (roomMap != null && roomMap.showing) {locPlay = roomMap.player;}
+        else {locPlay = player;}
+        if (locPlay.isMoving)
+        {
+            energy -= locPlay.normalizedSpeed * delta*0.02f;
+        }
+        if (energy<=0)
+        {
+            energy = 0;
+            //pass out...
+        }
+        gui.energyFill.setFill(energy/energyMax);
     }
 
     @Override
     public void render(float delta) {
         if (!lockMovement) player.update(delta);
-        if (!lockTime) updateGameTime(delta); // Update the game clock
+        if (!lockTime){
+            updateGameTime(delta);
+            updateEnergy(delta);
+        } // Update the game clock
 
         ScreenUtils.clear(0, 0, 1, 1);
-        drawWorldElements(delta);
-        drawUIElements();
-        drawGameTime(); // Draw current time
+        gameMap.update(delta);
+        gameMap.render();
+
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+
+        drawRoom(delta,game.batch);
+        updateEntities(delta);
+        drawEntities();
+
+        game.batch.end();
+        gui.counterText.text = String.format("Recreation Activities done: " + recActivity + "\nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
+        gui.render(game.batch);
+        drawGameTime();
     }
 
 
@@ -206,236 +168,18 @@ public class MainGameScreen implements Screen, InputProcessor {
     public void show() {
         Gdx.input.setInputProcessor(this);
         lockTime = false;
-        player.updateGender();
     }
 
-    /**
-     * Identifies which door, if any, the player is currently touching.
-     * @return The name of the door the player is touching or an empty string if none.
-     */
-    private String getDoorTouching(){
-        CollisionHandler collisionHandler = player.getCollisionHandler();
-        if (collisionHandler.isTouching("Comp_sci_door", player.getHitBox())) return "Comp_sci_door";
-        if (collisionHandler.isTouching("Piazza_door", player.getHitBox())) return "Piazza_door";
-        if (collisionHandler.isTouching("Gym_door", player.getHitBox())) return "Gym_door";
-        if (collisionHandler.isTouching("Goodricke_door", player.getHitBox())) return "Goodricke_door";
-        return "";
-    }
 
-    /**
-     * Determines the menu title based on the current activity selected by the player.
-     * @return The title for the menu based on the current activity.
-     */
-    private String getMenuTitle() {
-        switch (activity) {
-            case "study":
-                return "Study Schedule";
-            case "sleep":
-                return "Sleep Early";
-            case "exercise":
-                return "Exercise";
-            default:
-                return "";
-        }
-    }
-
-    /**
-     * Retrieves the appropriate button texture based on the current activity.
-     * @return The texture for the activity button.
-     */
-    private Texture getActivityButton() {
-        switch (activity) {
-            case "study":
-                return menuStudyButton;
-            case "sleep":
-                return menuSleepButton;
-            case "exercise":
-                return menuGoButton;
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Checks if the cursor is hovering over a menu option and changes its color accordingly.
-     * @param posX The X position of the menu option.
-     * @param posY The Y position of the menu option.
-     */
-    private void isHovering(float posX, float posY){
-        int mouseX = Gdx.input.getX();
-        int mouseY = game.screenHeight - Gdx.input.getY();
-        Vector3 menuOpt = camera.project(new Vector3(posX, posY, 0));
-        if (mouseX >= menuOpt.x && mouseX <= menuOpt.x + popupMenuWidth * zoom && mouseY >= menuOpt.y && mouseY <= menuOpt.y + popupMenuHeight * zoom) {
-            game.batch.setColor(shader);
-        }
-        else {
-            game.batch.setColor(Color.WHITE);
-        }
-    }
-
-    /**
-     * Draws a menu option at the specified position with a specified text and shade option.
-     * @param posX The X position of the menu option.
-     * @param posY The Y position of the menu option.
-     * @param text The text to display on the menu option.
-     * @param shadeOption Determines the shade of the menu option.
-     */
-    private void drawMenuOption(float posX, float posY, String text, int shadeOption){
-        if (shadeOption == 0) isHovering(posX, posY);
-        else if (shadeOption == 1) game.batch.setColor(Color.WHITE);
-        else if (shadeOption == 2) game.batch.setColor(shader);
-        GlyphLayout layout = new GlyphLayout();
-        layout.setText(popupFont, text);
-        game.batch.draw(popupMenu, posX, posY, popupMenuWidth, popupMenuHeight);
-        popupFont.draw(game.batch, text, posX + (popupMenuWidth - layout.width)/2, posY + (popupMenuHeight + layout.height)/2f - popupFont.getDescent() - layout.height/4f);
-        game.batch.setColor(Color.WHITE);
-    }
-
-    /**
-     * Renders the menu for setting the duration of an activity.
-     *
-     * This functionality of the popup menu (along with all the other methods that relate to this functionality)
-     * should be segregated into its own class to reduce overheads and processing delay.
-     */
-    private void drawDurationMenu(){
-        game.batch.begin();
-        Texture activityButton;
-        String title;
-        activityButton = getActivityButton();
-        title = getMenuTitle();
-
-        game.batch.draw(durationMenuBackground, durationMenuBackgroundX, durationMenuBackgroundY, durationMenuBackgroundWidth, durationMenuBackgroundHeight);
-        game.batch.draw(menuBackButton, menuBackButtonX, durationMenuButtonY, menuBackButtonWidth, menuBackButtonHeight);
-        game.batch.draw(activityButton, activityButtonX, durationMenuButtonY, activityButtonWidth, activityButtonHeight);
-        durationFont.draw(game.batch, title, 0, menuTitleY, game.screenWidth, Align.center, false);
-
-        if (!activity.equals("sleep")) {
-            game.batch.draw(durationDownButton, durationDownButtonX, durationButtonY, durationDownButtonWidth, durationDownButtonHeight);
-            game.batch.draw(durationUpButton, durationUpButtonX, durationButtonY, durationUpButtonWidth, durationUpButtonHeight);
-            durationFont.draw(game.batch, Integer.toString(duration), 0, durationTextY, game.screenWidth, Align.center, false);
-            durationFont.draw(game.batch, "Hours", 0, hoursLabelY, game.screenWidth, Align.center, false);
-        }
-
-        game.batch.end();
-    }
-
-    /**
-     * Draws the popup menu for interaction with various doors.
-     */
-    private void drawPopUpMenu(){
-        popupMenuType = getDoorTouching();
-        switch (popupMenuType) {
-            case "Comp_sci_door":
-                drawMenuOption(player.worldX + 30, player.worldY + 20, "Study", 0);
-                popupVisible = true;
-                break;
-            case "Piazza_door":
-//                drawMenuOption(player.worldX + 30, player.worldY + 20, "Study", 0);
-//                drawMenuOption(player.worldX + 30, player.worldY + 35, "Eat", 0);
-//                popupVisible = true;
-//                break;
-            case "Gym_door":
-                drawMenuOption(player.worldX + 30, player.worldY + 20, "Exercise", 0);
-                popupVisible = true;
-                break;
-            case "Goodricke_door":
-                int shadeOption;
-                if (currentHour >= 20) {
-                    popupVisible = true;
-                    shadeOption = 0;
-                } else {
-                    popupVisible = false;
-                    shadeOption = 2;
-                }
-                drawMenuOption(player.worldX + 30, player.worldY + 20, "Sleep", shadeOption);
-                break;
-            default:
-                popupVisible = false;
-                break;
-        }
-    }
-
-    /**
-     * Draws a shade overlay on the screen with a specified alpha transparency.
-     * @param alpha The transparency level of the overlay.
-     */
-    private void drawShadeOverlay(float alpha){
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 0, alpha); // Adjust alpha for darkness
-        shapeRenderer.rect(0, 0, gameMap.getWidth(), gameMap.getHeight());
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-    }
-
-    /**
-     * Initiates the fade out process and optionally resets the player's position.
-     * @param resetPos A boolean indicating whether to reset the player's position.
-     */
-    private void executeFadeOut(boolean resetPos){
-        if (fadeOut) return;
-        fadeOut = true;
-        lockMovement = true;
-        lockTime = true;
-        lockPopup = true;
-        showMenu = false;
-        this.resetPos = resetPos;
-        minShade = timeElapsed/secondsPerGameHour > 11 ? (timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour) : 0;
-    }
-
-    /**
-     * Manages the stepwise execution of the fade-out effect.
-     * @param delta The time elapsed since the last frame.
-     */
-    private void fadeOutStep(float delta){
-        if (fadeOut){
-            if (fadeTime == 0) fadeTime = minShade;
-            if (fadeTime <= 1) {
-                fadeTime += delta;
-                drawShadeOverlay(fadeTime);
-            }
-            else{
-                if (resetPos) {
-                    player.setPos( 1389, 635);
-                    player.setDirection('D');
-                }
-                fadeTime = 0;
-                fadeOut = false;
-                lockTime = false;
-                lockMovement = false;
-                lockPopup = false;
-                resetPos = false;
-            }
-        }
-    }
 
     /**
      * Renders the game world elements including the map and player.
      * @param delta The time elapsed since the last frame.
      */
-    private void drawWorldElements(float delta){
-        gameMap.update(delta);
-        gameMap.render();
-
-        game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-
-
-
-        drawRoom(delta,game.batch);
-        updateEntities(delta);
-        drawEntities();
-
-        if (!lockPopup) drawPopUpMenu();
-        game.batch.end();
-        if (!fadeOut && timeElapsed/secondsPerGameHour > 11) drawShadeOverlay((timeElapsed - 11 * secondsPerGameHour)/(gameDayLengthInSeconds - 11 * secondsPerGameHour));
-        fadeOutStep(delta);
-    }
     public void drawRoom(float delta,SpriteBatch batch)
     {
         updateRoom(delta);
-        if (roomMap != null)
+        if (roomMap != null && roomMap.showing)
         {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             shapeRenderer.setProjectionMatrix(camera.combined);
@@ -451,36 +195,74 @@ public class MainGameScreen implements Screen, InputProcessor {
             roomMap.update(delta);
             roomMap.render();
 
+
             roomMap.renderEntities(batch);
         }
+
     }
+
     public void updateRoom(float delta)
     {
-        if (roomMap == null)
+        if (getDoorTouching() == "")
         {
-            timer = 10;
-            t=0;
-        }else if (roomMap instanceof Piazza)
+            roomMap = null;
+        }
+        else if (getDoorTouching() != "" && roomMap == null)
         {
-            if (((Piazza) roomMap).interact()) {
-                if (roomMap.activityScreen != null) {game.screenManager.setScreen(roomMap.activityScreen,duration); }
-                roomMap = null;
-                lockMovement = false;
-
+            switch (getDoorTouching()){
+                case "Comp_sci_door":
+                    roomMap = csRoom;
+                    break;
+                case "Piazza_door":
+                    roomMap = piaRoom;
+                    break;
+                case "Gym_door":
+                    roomMap = gymRoom;
+                    break;
+                case "Goodricke_door":
+                    roomMap = accomRoom;
+                    break;
             }
         }
-        else {
-            t+= delta;
-            if (t>timer)
+
+
+        if (roomMap != null && !roomMap.showing && space)
+        {
+            roomMap.showing = true;
+            lockMovement = true;
+            space = false;
+
+        } else if (roomMap != null && roomMap.showing)
+        {
+            if (roomMap.interact() && space)
             {
-                if (activity == "sleep") {
-                    resetDay();
-                } else{game.screenManager.setScreen(roomMap.activityScreen,duration);}
+                switch(roomMap.activity)
+                {
+                    case EXIT:
+                        roomMap.showing = false;
+                        lockMovement = false;
+                        break;
+                    case EAT:
+                        game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
+                        roomMap.showing = false;
+                        lockMovement = false;
+                        break;
+                    case STUDY:
+                        gui.popupMenu.setPopText("Study");
+                        gui.popupMenu.showing = true;
+                        roomMap.lockMovement = true;
+                        break;
+                    case EXCERCISE:
+                        game.screenManager.setScreen(ScreenType.GYM,1d);
+                        break;
 
-                roomMap = null;
-                lockMovement = false;
+                }
+
+                space = false;
+
             }
         }
+
 
     }
 
@@ -489,7 +271,7 @@ public class MainGameScreen implements Screen, InputProcessor {
 
     private void drawEntities()
     {
-        int sX = Player.spriteX;
+        player.PS.render(game.batch);
         game.batch.draw(player.getCurrentFrame(), player.worldX, player.worldY, Player.spriteX, Player.spriteY);
         game.batch.draw(student1.getCurrentFrame(),student1.worldX,student1.worldY,Student.spriteX,Student.spriteY);
         game.batch.draw(student2.getCurrentFrame(),student2.worldX,student2.worldY,Student.spriteX,Student.spriteY);
@@ -502,21 +284,17 @@ public class MainGameScreen implements Screen, InputProcessor {
         student3.update(delta);
     }
 
-
-
     /**
-     * Renders the UI elements of the game.
+     * Identifies which door, if any, the player is currently touching.
+     * @return The name of the door the player is touching or an empty string if none.
      */
-    private void drawUIElements(){
-        String counterString = String.format("Recreation Activities done: " + recActivity + "\nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
-        game.batch.setProjectionMatrix(game.defaultCamera.combined);
-        if (showMenu) drawDurationMenu();
-        game.batch.begin();
-        game.batch.draw(menuButton, menuButtonX, menuButtonY, menuButtonWidth, menuButtonHeight);
-        game.batch.draw(energyBar, energyBarX, energyBarY, energyBarWidth, energyBarHeight);
-        game.batch.draw(counterBackground, counterBackgroundX, counterBackgroundY, counterBackgroundWidth, counterBackgroundHeight);
-        font.draw(game.batch, counterString, game.screenWidth - 320 * game.scaleFactorX, game.screenHeight - 40 * game.scaleFactorY);
-        game.batch.end();
+    private String getDoorTouching(){
+        CollisionHandler collisionHandler = player.getCollisionHandler();
+        if (collisionHandler.isTouching("Comp_sci_door", player.getHitBox())) return "Comp_sci_door";
+        if (collisionHandler.isTouching("Piazza_door", player.getHitBox())) return "Piazza_door";
+        if (collisionHandler.isTouching("Gym_door", player.getHitBox())) return "Gym_door";
+        if (collisionHandler.isTouching("Goodricke_door", player.getHitBox())) return "Goodricke_door";
+        return "";
     }
 
     /**
@@ -551,18 +329,12 @@ public class MainGameScreen implements Screen, InputProcessor {
 
     }
 
-    /**
-     * Resets the game day, including resetting time and increasing the day counter.
-     */
     private void resetDay(){
-        executeFadeOut(true);
         currentHour = 8;
         dayNum++;
         timeElapsed = 0;
         energyCounter += 4;
         if (energyCounter > 10) energyCounter = 10;
-        energyBar.dispose();
-        energyBar = setEnergyBar();
     }
 
     /**
@@ -576,21 +348,7 @@ public class MainGameScreen implements Screen, InputProcessor {
         game.batch.end();
     }
 
-    /**
-     * Sets the texture for the energy bar based on the current energy level.
-     * @return The texture of the current energy bar.
-     */
-    public Texture setEnergyBar() {
-        if (energyCounter > 0) {
-            return new Texture("energy/energy_" + energyCounter + ".png");
-        } else {
-            return new Texture("energy/energy_0.png");
-        }
-    }
 
-    public int getEnergyCounter(){
-        return this.energyCounter;
-    }
 
     /**
      * Handles touch input from the user, managing interactions with UI elements and game objects.
@@ -603,196 +361,47 @@ public class MainGameScreen implements Screen, InputProcessor {
      */
     @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button){
-        touchY = game.screenHeight - touchY;
-
-        if (touchX >= menuButtonX && touchX <= menuButtonX + menuButtonWidth && touchY >= menuButtonY && touchY <= menuButtonY + menuButtonHeight) {
+        Vector2 mouse = new Vector2(touchX,game.screenHeight - touchY);
+        if (gui.menuButton.overlap(mouse,zoom)) {
             game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
         }
-        else if (showMenu){
-            switch (activity){
-                case "study":
-                    if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration < 4) duration++;
-                    } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration > 1) duration--;
-                    } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        duration = 1;
-                    } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        studyHours += duration;
-                        if (energyCounter > (duration+1)/2) energyCounter -= (duration+1)/2;
-                        energyBar.dispose();
-                        energyBar = setEnergyBar();
-                        timeElapsed += duration * secondsPerGameHour;
-                        roomMap = studyRoom;
-                        lockMovement = true;
-
-
-                    }
-                    break;
-
-                case "exercise":
-                    if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration < 4) duration++;
-                    } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration > 1) duration--;
-                    } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        duration = 1;
-                    } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (energyCounter >= duration) {
-                            executeFadeOut(false);
-                            showMenu = false;
-                            lockMovement = fadeOut;
-                            recActivity++;
-                            energyCounter -= duration;
-                            energyBar.dispose();
-                            energyBar = setEnergyBar();
-                            timeElapsed += duration * secondsPerGameHour;
-                            duration = 1;
-                            game.screenManager.setScreen(ScreenType.PONG_MINI_GAME);
-                        }
-                    }
-                    break;
-
-                case "sleep":
-                    if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration < 10) duration++;
-                    } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration > 1) duration--;
-                    } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        duration = 1;
-                    } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        resetDay();
-                        duration = 1;
-
-                    }
-                    break;
-                case "eat":
-                    if (touchX >= durationUpButtonX && touchX <= durationUpButtonX + durationUpButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationUpButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration < 4) duration++;
-                    } else if (touchX >= durationDownButtonX && touchX <= durationDownButtonX + durationDownButtonWidth && touchY >= durationButtonY && touchY <= durationButtonY + durationDownButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        if (duration > 1) duration--;
-                    } else if (touchX >= menuBackButtonX && touchX <= menuBackButtonX + menuBackButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + menuBackButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        duration = 1;
-                    } else if (touchX >= activityButtonX && touchX <= activityButtonX + activityButtonWidth && touchY >= durationMenuButtonY && touchY <= durationMenuButtonY + activityButtonHeight) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = false;
-                        lockMovement = fadeOut;
-                        mealCount++;
-
-                    }
-                    break;
+        if (gui.popupMenu.showing)
+        {
+            if(gui.popupMenu.durUpB.overlap(mouse,zoom)){
+                game.audio.buttonClickedSoundActivate();
+                gui.popupMenu.changeDur(1);
+                //duration up
+                return true;
+            } else if (gui.popupMenu.durDownB.overlap(mouse,zoom))
+            {
+                game.audio.buttonClickedSoundActivate();
+                gui.popupMenu.changeDur(-1);
+                //duration down
+                return true;
+            } else if (gui.popupMenu.BackB.overlap(mouse,zoom))
+            {
+                game.audio.buttonClickedSoundActivate();
+                //close menu
+                roomMap.lockMovement=false;
+                gui.popupMenu.showing = false;
+                return true;
+            }else if (gui.popupMenu.GoB.overlap(mouse,zoom))
+            {
+                game.audio.buttonClickedSoundActivate();
+                //start activity
+                game.screenManager.setScreen(ScreenType.TYPING_MINI_GAME,gui.popupMenu.getDuration());
+                gui.popupMenu.showing = false;
+                roomMap.lockMovement=false;
+                return true;
             }
         }
-        else if (popupVisible){
-            Vector3 studyOpt = camera.project(new Vector3(player.worldX + 30, player.worldY + 20, 0));
-            Vector3 eatOpt = camera.project(new Vector3(player.worldX + 30, player.worldY + 35, 0));
-            switch (popupMenuType) {
-                case "Comp_sci_door":
-                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = true;
-                        lockMovement = true;
-                        activity = "study";
-                        activities.add(activity);
-                        duration = 1;
-                        studyRoom = new CS(this.game,roomCam);
-                        lockMovement = true;
-                    }
-                    break;
-
-                case "Piazza_door":
-                    roomMap = new Piazza(this.game,roomCam);
-                    lockMovement = true;
-//                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-//                        game.audio.buttonClickedSoundActivate();
-//                        showMenu = true;
-//                        lockMovement = true;
-//                        activity = "study";
-//                        activities.add(activity);
-//                        duration = 1;
-//                        studyRoom = new Piazza(this.game,roomCam,"study");
-//                        lockMovement = true;
-//
-//                    }
-//                    else if (touchX >= eatOpt.x && touchX <= eatOpt.x + popupMenuWidth * zoom && touchY >= eatOpt.y && touchY <= eatOpt.y + popupMenuHeight * zoom) {
-//                        game.audio.buttonClickedSoundActivate();
-//                        game.audio.eatingSoundActivate();
-//                        energyCounter += 3;
-//                        mealCount++;
-//                        if (energyCounter > 10) energyCounter = 10;
-//                        energyBar.dispose();
-//                        energyBar = setEnergyBar();
-//                        activities.add("eat");
-//                        showMenu = false;
-//                        lockMovement = true;
-//                        activity = "eat";
-//                        duration = 1;
-//                        roomMap = new Piazza(this.game,roomCam,activity);
-//                        lockMovement = true;
-//                    }
-                    break;
-
-                case "Gym_door":
-                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = true;
-                        lockMovement = true;
-                        activity = "exercise";
-                        duration = 1;
-                        activities.add(activity);
-                    }
-                    break;
-
-                case "Goodricke_door":
-                    if (touchX >= studyOpt.x && touchX <= studyOpt.x + popupMenuWidth * zoom && touchY >= studyOpt.y && touchY <= studyOpt.y + popupMenuHeight * zoom) {
-                        game.audio.buttonClickedSoundActivate();
-                        showMenu = true;
-                        lockMovement = true;
-                        activity = "sleep";
-                        duration = 1;
-                        activities.add(activity);
-                        roomMap = new Accom(this.game,roomCam);
-                        lockMovement = true;
-                    }
-                    break;
-            }
-        }
-
         return true;
     }
 
     @Override
     public void resize(int i, int i1) {
-        calculateDimensions();
-        calculatePositions();
+
     }
 
     @Override
@@ -812,38 +421,29 @@ public class MainGameScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
-        menuButton.dispose();
-        counterBackground.dispose();
-        popupMenu.dispose();
-        durationMenuBackground.dispose();
-        durationUpButton.dispose();
-        durationDownButton.dispose();
-        menuBackButton.dispose();
-        menuStudyButton.dispose();
-        menuSleepButton.dispose();
-        menuGoButton.dispose();
-        energyBar.dispose();
         player.dispose();
         font.dispose();
-        popupFont.dispose();
-        durationFont.dispose();
+        roomMap.dispose();
+        csRoom.dispose();
+        piaRoom.dispose();
+        accomRoom.dispose();
+        gymRoom.dispose();
     }
 
     @Override
     public boolean keyDown(int i) {
-        if (i == Input.Keys.SPACE)
-        {
-            if (getDoorTouching() == "Piazza_door") {
-                roomMap = new Piazza(game,roomCam);
-                lockMovement = true;
-            }
+        if (i == Input.Keys.SPACE) {
+            space = true;
         }
         return false;
     }
 
     @Override
     public boolean keyUp(int i) {
+        if (i == Input.Keys.SPACE) {
+            space = false;
+        }
+
         return false;
     }
 

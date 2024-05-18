@@ -31,7 +31,7 @@ public class Library extends GameMap{
 
     public void setRoom(OrthographicCamera camera)
     {
-        player = new Player(game,(GameMap) this, camera);
+        player = new Player(game,(GameMap) this, camera,80,80);
         player.camFollow = false;
         student = new Student((GameMap) this, 50,50);
         student.setPath(new Vector2[] {new Vector2(50,50),new Vector2(100,50),new Vector2(100,100)});

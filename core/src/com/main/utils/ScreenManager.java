@@ -116,6 +116,8 @@ public class ScreenManager {
                 return new LeaderboardScreen(game);
             case TUTORIAL:
                 return new TutorialScreen(game);
+            case GYM:
+                return new GymMini(game,(int) args[0] );
         }
         return null;
     }

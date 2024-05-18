@@ -32,11 +32,10 @@ public class Student extends Entity {
     int nextKey = 1;
     float pathTime,pathDst;
 
-    public float startX, startY;
     Texture sprSheet;
     public static int spriteX = 16;
     public static int spriteY = 16;
-    public boolean canInteract;
+    public boolean canInteract,idle;
     String disText;
     public TextBox textBox;
 
@@ -46,8 +45,10 @@ public class Student extends Entity {
 
     public Student(GameMap gameMap,int startX, int startY)
     {
+        super(startX,startY);
         this.gameMap = gameMap;
 
+        idle = true;
 
 
         tileSize = gameMap.getTileSize();
@@ -55,12 +56,10 @@ public class Student extends Entity {
         this.collisionHandler.addCollisionLayers("Trees", "wall_1", "wall_2", "wall_3", "roof_1", "roof_2", "roof_3", "other", "lilipads");
 
         this.speed = 200;
-        worldX = startX;
-        worldY = startY;
+        this.worldX = startX;
+        this.worldY = startY;
+        Gdx.app.log("hi",String.valueOf(worldX));
 
-
-        pathKey = new Vector2[] {new Vector2(0,0),new Vector2(0,0)};
-        setPath(pathKey);
 
         sprSheet = new Texture("character/NPCS.png");
         int row = 0;
@@ -87,7 +86,7 @@ public class Student extends Entity {
         walkLeftAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 1,16,16,false));
         walkRightAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 2,16,16,false));
         walkUpAnimation = new Animation<>(animation_speed, getFrames(sprSheet,frames,row + 3,16,16,false));
-
+        currentAnimation = walkDownAnimation;
 
     }
     public void setTextBox(String text, int height, int width, BitmapFont font)
@@ -116,8 +115,10 @@ public class Student extends Entity {
 
 
         stateTime += delta;
-        updatePath(delta);
+
+        if(!idle){updatePath(delta);}
         if (canInteract) {textBox.setPosition((int)worldX,(int)worldY+spriteY+ 30);}
+
     }
     private void updatePath(float delta)
     {
@@ -137,7 +138,7 @@ public class Student extends Entity {
 
 
     public void setPath(Vector2[] keyP){
-
+        idle = false;
         pathKey = keyP;
         pathDst = calcPathDst();
         setDir(pathKey[currentKey],pathKey[nextKey]);

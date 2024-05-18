@@ -32,8 +32,9 @@ public class CS extends GameMap{
 
     public void setRoom(OrthographicCamera camera)
     {
-        player = new Player(game,(GameMap) this, camera);
+        player = new Player(game,this, camera,80,80);
         player.camFollow = false;
+
         student = new Student((GameMap) this, 50,50);
         student.setPath(new Vector2[] {new Vector2(50,50),new Vector2(100,50),new Vector2(100,100)});
         entities.add(student);
@@ -55,6 +56,23 @@ public class CS extends GameMap{
         for (Entity e :entities) {
             e.update(delta);
         }
+    }
+
+    public boolean interact()
+    {
+        if (playerDoor()){return playerDoor();}
+        return false;
+    }
+
+
+
+    public boolean playerDoor()
+    {
+        if (new Vector2(player.worldX,player.worldY).dst(40,40) < 30)
+        {
+            activityScreen = null;
+            return true;
+        }else return false;
     }
 
 

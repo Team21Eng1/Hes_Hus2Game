@@ -10,8 +10,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.main.Main;
 import com.main.entity.Entity;
+import com.main.entity.Player;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
 import java.util.ArrayList;
@@ -28,6 +31,11 @@ public class GameMap extends TiledMap {
     int tileSize = 16;
     float layerToggleTime;
     public ScreenType activityScreen;
+    public String Activity;
+    public Player player;
+    public Boolean showing;
+    public ActivityType activity;
+    public boolean lockMovement = false;
 
     ArrayList<Entity> entities;
     BitmapFont font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
@@ -49,6 +57,8 @@ public class GameMap extends TiledMap {
         tiledMapRenderer = new OrthogonalTiledMapRenderer(gameMap);
         entities = new ArrayList<Entity>();
         this.camera = camera;
+        this.showing = false;
+        this.activity = ActivityType.NONE;
     }
 
     /**
@@ -81,7 +91,22 @@ public class GameMap extends TiledMap {
     {
 
     }
+    public boolean PlayerStudent(Entity e)
+    {
+        return false;
+    }
+    public boolean interact()
+    {
+        if (playerDoor()){return playerDoor();}
+        return false;
+    }
 
+
+
+    public boolean playerDoor()
+    {
+        return false;
+    }
 
     /**
      * Toggles the visibility of a specific layer within the map.
