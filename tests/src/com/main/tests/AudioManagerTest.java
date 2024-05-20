@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-public class AudioManagerTest {
+public class AudioManagerTest extends LibgdxUnitTest {
     @Mock
     Music bgMusic;
     @Mock

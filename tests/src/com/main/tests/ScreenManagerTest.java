@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-public class ScreenManagerTest {
+public class ScreenManagerTest extends LibgdxUnitTest{
     @Mock
     Main game;
     @Mock

@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-public class TypingGameTest {
+public class TypingGameTest extends LibgdxUnitTest{
     @Mock
     Main game;
     @Mock

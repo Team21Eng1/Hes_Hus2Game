@@ -17,7 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
-public class EndScreenTest {
+public class EndScreenTest extends LibgdxUnitTest{
     @Mock
     Main game;
     @Mock
@@ -27,7 +27,7 @@ public class EndScreenTest {
     @Mock
     BitmapFont font;
     @InjectMocks
-    EndScreen endScreen = new EndScreen(game);
+    EndScreen endScreen  = new EndScreen(game);
 
     @BeforeEach
     void setUp() {

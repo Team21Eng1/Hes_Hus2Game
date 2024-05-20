@@ -17,7 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
-public class MainControlScreenTest {
+public class MainControlScreenTest extends LibgdxUnitTest{
     @Mock
     Main game;
     @Mock

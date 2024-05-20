@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
-public class MainSettingsScreenTest {
+public class MainSettingsScreenTest extends LibgdxUnitTest{
     @Mock
     Main game;
     @Mock

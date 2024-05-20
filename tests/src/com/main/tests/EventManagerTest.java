@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 
 import java.util.List;
 
-public class EventManagerTest {
+public class EventManagerTest extends LibgdxUnitTest{
     @InjectMocks
     EventManager eventManager = new EventManager();
 

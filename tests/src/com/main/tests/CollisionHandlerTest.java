@@ -21,7 +21,7 @@ import static com.main.entity.Student.spriteX;
 import static com.main.entity.Student.spriteY;
 import static org.mockito.Mockito.*;
 
-public class CollisionHandlerTest {
+public class CollisionHandlerTest extends LibgdxUnitTest {
     @Mock
     GameMap gamemap;
     @Mock
