@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 import com.main.Main;
 import com.main.entity.Entity;
 import com.main.entity.Player;
@@ -23,12 +24,13 @@ public class Accom extends GameMap{
      */
     Student student;
     Main game;
+    public boolean freeze;
     public Accom(Main game, OrthographicCamera camera) {
         super(game,camera, "map/interior_maps/goodrickeaccom .tmx");
         this.game = game;
         setRoom(camera);
         activityScreen = null;
-
+        freeze = false;
     }
 
     public void setRoom(OrthographicCamera camera)
@@ -42,7 +44,7 @@ public class Accom extends GameMap{
         entities.add(player);
         for (Entity e :entities) {
             e.collisionHandler.clearCollisionLayers();
-            e.collisionHandler.addCollisionLayers("collision");
+            e.collisionHandler.addCollisionLayers("Collision");
         }
     }
     public void renderEntities(SpriteBatch batch){
@@ -50,11 +52,16 @@ public class Accom extends GameMap{
         for (Entity e :entities) {
             batch.draw(e.getCurrentFrame(),e.worldX,e.worldY,e.getSpriteX(),e.getSpriteY());
         }
+        if (playerBed())
+        {
+            font.draw(batch,"Sleep?",50,200,100, Align.center,true);
+        }
     }
 
     public boolean interact()
     {
         if (playerDoor()){return playerDoor();}
+        if (playerBed()){return playerBed();}
         return false;
     }
 
@@ -62,17 +69,17 @@ public class Accom extends GameMap{
 
     public boolean playerDoor()
     {
-        if (new Vector2(player.worldX,player.worldY).dst(40,0) < 10)
+        if (new Vector2(player.worldX,player.worldY).dst(50,15) < 25)
         {
-            activity = ActivityType.EXCERCISE;
+            activity = ActivityType.EXIT;
             return true;
         }else return false;
     }
     public boolean playerBed()
     {
-        if (new Vector2(player.worldX,player.worldY).dst(80,112) < 20)
+        if (new Vector2(player.worldX,player.worldY).dst(40,112) < 40)
         {
-            activityScreen = null;
+            activity = ActivityType.SLEEP;
             return true;
         }else return false;
     }
@@ -80,7 +87,12 @@ public class Accom extends GameMap{
     public void update(float delta)
     {
         for (Entity e :entities) {
-            e.update(delta);
+
+            if (e instanceof Player)
+            {
+                if (!freeze) e.update(delta);
+
+            } else {e.update(delta);}
         }
     }
 

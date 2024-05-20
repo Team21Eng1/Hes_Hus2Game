@@ -8,6 +8,7 @@ import com.main.Main;
 import com.main.entity.Entity;
 import com.main.entity.Player;
 import com.main.entity.Student;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
 import java.io.File;
@@ -35,20 +36,25 @@ public class CS extends GameMap{
         player = new Player(game,this, camera,80,80);
         player.camFollow = false;
 
-        student = new Student((GameMap) this, 50,50);
-        student.setPath(new Vector2[] {new Vector2(50,50),new Vector2(100,50),new Vector2(100,100)});
+        student = new Student((GameMap) this, 130,220);
+        student.setTextBox("Lecture?",100,100,font);
+
         entities.add(student);
 
         entities.add(player);
         for (Entity e :entities) {
             e.collisionHandler.clearCollisionLayers();
-            e.collisionHandler.addCollisionLayers("computers","chairs");
+            e.collisionHandler.addCollisionLayers("COLLISION");
         }
     }
     public void renderEntities(SpriteBatch batch){
 
         for (Entity e :entities) {
             batch.draw(e.getCurrentFrame(),e.worldX,e.worldY,e.getSpriteX(),e.getSpriteY());
+            if (e instanceof Student && ((Student) e).canInteract)
+            {
+                ((Student) e).textBox.render(batch);
+            }
         }
     }
     public void update(float delta)
@@ -61,16 +67,28 @@ public class CS extends GameMap{
     public boolean interact()
     {
         if (playerDoor()){return playerDoor();}
+        if (playerStudent(student)){return playerStudent(student);}
+        return false;
+    }
+    public boolean playerStudent(Entity e)
+    {
+        if (new Vector2(player.worldX,player.worldY).dst(e.worldX,e.worldY) < 20)
+        {
+            if (e == student)
+            {
+                activity = ActivityType.NONE;
+                return true;
+            }
+        }
         return false;
     }
 
 
-
     public boolean playerDoor()
     {
-        if (new Vector2(player.worldX,player.worldY).dst(40,40) < 30)
+        if (new Vector2(player.worldX,player.worldY).dst(140,20) < 30)
         {
-            activityScreen = null;
+            activity = ActivityType.EXIT;
             return true;
         }else return false;
     }

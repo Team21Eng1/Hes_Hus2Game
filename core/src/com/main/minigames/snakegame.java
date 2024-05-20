@@ -2,12 +2,17 @@ package com.main.minigames;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -15,7 +20,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.main.Main;
+import com.main.entity.Entity;
 import com.main.screens.MainGameScreen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -24,6 +31,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
 import java.security.AlgorithmConstraints;
@@ -43,9 +51,15 @@ public class snakegame implements Screen {
     private Stage stage;
     private Skin skin;
     private Window popupWindow;
+    private Rectangle screen;
+    private ShapeRenderer shapeRenderer;
+    private static float tileSize = 45;
 
+    float timer,t;
+    private Texture foreGroundImage;
+    private Entity foreground;
 
-
+    private OrthographicCamera cam;
 
 
     public snakegame (Main game) {
@@ -55,42 +69,44 @@ public class snakegame implements Screen {
     @Override
     public void show() {
         customFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        batch = new SpriteBatch();
+        batch = game.batch;
+        shapeRenderer = new ShapeRenderer();
+
+
+
 
         backgroundTexture = new Texture("snakegame/snakegrass.png");
         headTexture = new Texture("snakegame/head_right.png");
         bodyTexture = new Texture("snakegame/body_horizontal.png");
         appleTexture = new Texture("snakegame/apple.png");
-
+        screen = new Rectangle(0,0,tileSize*9,tileSize*16);
         snake =new Array<>();
         initializeSnake();
+
+        this.cam = new OrthographicCamera();
+        this.cam.setToOrtho(false, this.game.screenWidth, this.game.screenHeight);
+        this.cam.rotate(new Vector3(0,0,1),8.5f);
+        game.defaultCamera.rotate(new Vector3(0,0,1),0);
+        cam.position.x = -276;
+        cam.position.y = 274;
+        cam.update();
+
+
+        foreGroundImage = new Texture("gymmini/EatPhon.png");
+        foreground = new Entity(0,0);
+        foreground.currentAnimation= new Animation<>(0.4f,foreground.getFrames(foreGroundImage,0,3,0,1600,900,false));
 
         apple = new Rectangle();
         placeApple();
 
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-        setupPopup();
-
-
-        Texture exitTexture = new Texture("menu_gui/exit_button.png");
-        ImageButton exitButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(exitTexture)));
-        exitButton.getImage().setScale(3f);
-        exitButton.setPosition(Gdx.graphics.getWidth() - exitButton.getWidth() - 65,30);
-
-
-        exitButton.addListener(new ClickListener(){
-            public void clicked (InputEvent event, float x, float y){
-                game.screenManager.setScreen(ScreenType.GAME_SCREEN);
-            }
-        });
-        stage.addActor(exitButton);
+        timer = 0.1f;
+        t=0;
     }
     private void initializeSnake(){
         snake.clear();
-        snake.add(new Rectangle(160,100,20,20));
-        snake.add(new Rectangle(140, 100, 20, 20));
-        snake.add(new Rectangle(120, 100, 20, 20));
+        snake.add(new Rectangle(screen.x + 4*tileSize, screen.y + 5*tileSize,tileSize,tileSize));
+        snake.add(new Rectangle(screen.x + 3*tileSize, screen.y + 5*tileSize, tileSize, tileSize));
+        snake.add(new Rectangle(screen.x + 2*tileSize, screen.y + 5*tileSize, tileSize, tileSize));
     }
 
 
@@ -104,7 +120,7 @@ public class snakegame implements Screen {
         popupWindow = new Window("HOW TO PLAY", windowStyle);
         popupWindow.getTitleLabel().setAlignment(Align.center);
         popupWindow.setSize(350, 350);
-        popupWindow.setPosition(Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() / 2 - 200);
+        popupWindow.setPosition(game.screenWidth / 2 - 200, game.screenHeight / 2 - 200);
         popupWindow.align(Align.center);
         popupWindow.setModal(true);
         popupWindow.setVisible(true);
@@ -138,27 +154,64 @@ public class snakegame implements Screen {
     @Override
     public void render(float delta) {
         handleInput();
-        if (System.currentTimeMillis() - lastUpdateTime > moveTime * 1000) {
+
+
+        foreground.stateTime+=delta;
+        t+=delta;
+
+        if (t>timer) {
             moveSnake();
-            lastUpdateTime = System.currentTimeMillis();
+            t=0;
         }
+
+
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        for (Rectangle bodyPart : snake) {
-            Texture texture = bodyPart.equals(snake.first()) ? headTexture : bodyTexture;
-            batch.draw(texture, bodyPart.x, bodyPart.y);
+
+
+        game.batch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.rect(screen.x, screen.y, screen.width, screen.height);
+        int col = 0;
+        for (int y = 0;y<16;y++)
+        {
+            for (int x = 0; x<9;x++)
+            {
+                if (col == 0) {
+                    shapeRenderer.setColor(Color.valueOf("4e1384"));
+                    col++;
+                } else {
+                    col--;
+                    shapeRenderer.setColor(Color.valueOf("3e2e9f"));
+                }
+
+                shapeRenderer.rect(screen.x + x*tileSize, screen.y+y*tileSize, tileSize, tileSize);
+            }
+//            if (col == 1) {col=0;} else {col=1;}
         }
-        batch.draw(appleTexture, apple.x, apple.y);
-        customFont.draw(batch, "Score:" + score, 10, Gdx.graphics.getHeight() - 10);
+        shapeRenderer.end();
+
+        batch.begin();
+        //batch.draw(backgroundTexture, 0, 0, game.screenWidth, game.screenHeight);
+        for (int i = 0;i<snake.size;i++) {
+            Texture texture = getSnakeTexture(i);
+            batch.draw(texture, snake.get(i).x, snake.get(i).y,tileSize,tileSize);
+        }
+        batch.draw(appleTexture, apple.x, apple.y,tileSize,tileSize);
+        customFont.draw(batch, "Score:" + score, 10, game.screenHeight - 10);
         customFont.draw(batch, "Use arrow keys to move the snake",
-                Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
+                game.screenWidth - 400, game.screenHeight - 10);
 
         batch.end();
+        game.batch.setProjectionMatrix(game.defaultCamera.combined);
+        batch.begin();
+        batch.draw(foreground.getCurrentFrame(),0,0,game.screenWidth,game.screenHeight);
+        batch.end();
 
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
+
 
     }
 
@@ -179,28 +232,87 @@ public class snakegame implements Screen {
 
     }
 
+    public Texture getSnakeTexture(int snakeIndex)
+    {
+        //up down left right
+        Vector4 URDL = new Vector4(0,0,0,0);
+        Rectangle last,cur,next;
+        cur = snake.get(snakeIndex);
+        if (snakeIndex == 0) {
+            return headTexture;
+        }
+        else if (snakeIndex == snake.size-1) {
+            //tail
+            last = snake.get(snakeIndex-1);
+            if (last.x > cur.x) { URDL.y = 1;}
+            else if (last.x < cur.x){URDL.w = 1;}
+            else{
+                if (last.y > cur.y) { URDL.x = 1;}
+                else {URDL.z = 1;}
+            }
+            if (URDL.x==1) {return new Texture("snakegame/tail_down.png");}
+            if (URDL.y==1) {return new Texture("snakegame/tail_left.png");}
+            if (URDL.z==1) {return new Texture("snakegame/tail_up.png");}
+            if (URDL.w==1) {return new Texture("snakegame/tail_right.png");}
+        }
+        else
+        {
+            next = snake.get(snakeIndex+1);
+            last = snake.get(snakeIndex-1);
+
+            if (last.x > cur.x) { URDL.y = 1;}
+            else if (last.x < cur.x){URDL.w = 1;}
+            else{
+                if (last.y > cur.y) { URDL.x = 1;}
+                else {URDL.z = 1;}
+            }
+            if (next.x > cur.x) { URDL.y = 1;}
+            else if (next.x < cur.x){URDL.w = 1;}
+            else{
+                if (next.y > cur.y) { URDL.x = 1;}
+                else {URDL.z = 1;}
+            }
+            return getTextFromDir(URDL);
+        }
+        return getTextFromDir(URDL);
+
+    }
+    public Texture getTextFromDir(Vector4 URDL)
+    {
+        if ((URDL.x == 1)&&(URDL.y == 1)) return new Texture("snakegame/body_topright.png");
+        if ((URDL.x == 1)&&(URDL.z == 1)) return new Texture("snakegame/body_vertical.png");
+        if ((URDL.x == 1)&&(URDL.w == 1)) return new Texture("snakegame/body_topleft.png");
+        if ((URDL.z == 1)&&(URDL.y == 1)) return new Texture("snakegame/body_bottomright.png");
+        if ((URDL.z == 1)&&(URDL.w == 1)) return new Texture("snakegame/body_bottomleft.png");
+        if ((URDL.y == 1)&&(URDL.w == 1)) return new Texture("snakegame/body_horizontal.png");
+        return new Texture("snakegame/body_vertical.png");
+    }
+
+
     public void moveSnake() {
-        Rectangle head = new Rectangle(snake.first().x, snake.first().y, 20, 20);
+        Rectangle head = new Rectangle(snake.first().x, snake.first().y, tileSize, tileSize);
         switch (snakeDirection) {
             case Input.Keys.LEFT:
-                head.x -= 20;
-                if (head.x < 0) head.x = Gdx.graphics.getWidth() - 20;
+                head.x -= tileSize;
+                if (head.x < screen.x) head.x = screen.x+screen.width - tileSize;
                 break;
             case Input.Keys.RIGHT:
-                head.x += 20;
-                if (head.x >= Gdx.graphics.getWidth()) head.x = 0;
+                head.x += tileSize;
+                if (head.x >= screen.x+screen.width) head.x = screen.x;
                 break;
             case Input.Keys.UP:
-                head.y += 20;
-                if (head.y >= Gdx.graphics.getHeight()) head.y = 0;
+                head.y += tileSize;
+                if (head.y >= screen.y+screen.height) head.y = screen.y;
                 break;
             case Input.Keys.DOWN:
-                head.y -= 20;
-                if (head.y < 0) head.y = Gdx.graphics.getHeight() - 20;
+                head.y -= tileSize;
+                if (head.y < screen.y) head.y = screen.y+screen.height - tileSize;
                 break;
         }
         if (checkCollision(head)) {
+            game.eventM.logEvent(ActivityType.EAT,score);
             game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+            this.dispose();
         } else {
             snake.insert(0, head);
 
@@ -228,9 +340,10 @@ public class snakegame implements Screen {
 
         boolean placed = false;
         while (!placed) {
-            int newX = MathUtils.random(0, Gdx.graphics.getWidth() / 20 - 1) * 20;
-            int newY = MathUtils.random(0, Gdx.graphics.getHeight() / 20 - 1) * 20;
-            apple.set(newX, newY, 20, 20);
+            int newX = (int) MathUtils.random(0,(screen.width)/tileSize);
+            int newY = (int) MathUtils.random(0,(screen.height)/tileSize);
+            newX*=tileSize;newY*=tileSize;
+            apple.set(screen.x+newX, screen.y+newY, tileSize, tileSize);
 
             placed = true;
             for (Rectangle segment : snake) {
@@ -244,7 +357,7 @@ public class snakegame implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+
 
     }
 
@@ -266,11 +379,9 @@ public class snakegame implements Screen {
     @Override
     public void dispose() {
         backgroundTexture.dispose();
-        batch.dispose();
         headTexture.dispose();
         bodyTexture.dispose();
         appleTexture.dispose();
         customFont.dispose();
-        stage.dispose();
     }
 }

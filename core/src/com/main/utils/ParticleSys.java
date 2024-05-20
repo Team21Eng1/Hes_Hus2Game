@@ -23,7 +23,6 @@ public class ParticleSys {
     }
 
     public void render(SpriteBatch batch){
-        Gdx.app.log("dir", String.valueOf(parent.dir));
         if (particles.size() > 0) {
             for (Particle p : particles) {
                 batch.draw(p.getCurrentFrame(), p.worldX, p.worldY);

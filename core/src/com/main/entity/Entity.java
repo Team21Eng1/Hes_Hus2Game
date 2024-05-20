@@ -83,6 +83,7 @@ public class Entity extends Sprite {
     }
 
     public void update(float delta) {
+
     }
     public int getSpriteX()
     {

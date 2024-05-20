@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
@@ -40,13 +41,14 @@ public class MainGameScreen implements Screen, InputProcessor {
     private final Main game;
     private final float gameDayLengthInSeconds;
     private final float secondsPerGameHour;
+    private float FadePerc;
 
 
     // Non-final attributes
     private String activity;
-    private int energyCounter, duration, dayNum, recActivity, studyHours, mealCount, currentHour;
+    private int duration, dayNum,currentHour;
     private float timeElapsed, fadeTime, minShade;
-    private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
+    private boolean fadeOut, lockTime, lockMovement;
     private GUI gui;
 
 
@@ -57,6 +59,8 @@ public class MainGameScreen implements Screen, InputProcessor {
     private boolean space;
     private float energyMax, energy;
     public GameMap roomMap,csRoom,piaRoom,accomRoom,gymRoom;
+
+    public int score;
 
 
     /**
@@ -72,14 +76,13 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.secondsPerGameHour = this.gameDayLengthInSeconds / 16; // Assuming 16 hours in a day
 
         // Initialize non-final attributes
-        this.activity = "";
         this.duration = 1;
         this.dayNum = 1;
         this.timeElapsed = 0f;
         this.currentHour = 10;
         this.fadeTime = 0;
         this.minShade = 0;
-        this.fadeOut = this.lockTime = this.lockMovement = this.lockPopup = this.resetPos = this.popupVisible = this.showMenu = false;
+        this.fadeOut = this.lockTime = this.lockMovement = false;
 
         // Setting up the game
         this.camera = new OrthographicCamera();
@@ -101,6 +104,7 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         this.shapeRenderer = new ShapeRenderer();
 
+
         this.player.setPos(1389, 635);
         this.camera.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
         this.roomCam.setToOrtho(false, this.game.screenWidth / this.zoom, this.game.screenHeight / this.zoom);
@@ -108,31 +112,38 @@ public class MainGameScreen implements Screen, InputProcessor {
         this.camera.update();
         this.roomCam.update();
         this.guiCam.update();
+        this.shapeRenderer.setProjectionMatrix(camera.combined);
 
         roomMap = null;
 
         csRoom = new CS(this.game,this.roomCam);
         accomRoom = new Accom(this.game,this.roomCam);
         piaRoom = new Piazza(this.game,this.roomCam);
-        gymRoom = new RonCook(this.game,this.roomCam);
+        gymRoom = new Gym(this.game,this.roomCam);
 
         space = false;
 
         this.energyMax = 100f;
         this.energy = 100f;
+
+        this.FadePerc = 0;
+        fadeOut = false;
     }
     public void updateEnergy(float delta)
     {
         Player locPlay;
         if (roomMap != null && roomMap.showing) {locPlay = roomMap.player;}
         else {locPlay = player;}
-        if (locPlay.isMoving)
+        if(locPlay==null){locPlay=player;}
+        if (locPlay.isMoving && !lockMovement)
         {
             energy -= locPlay.normalizedSpeed * delta*0.02f;
         }
         if (energy<=0)
         {
-            energy = 0;
+            energy = 70;
+            resetDay();
+            player.setPos(1389, 635);
             //pass out...
         }
         gui.energyFill.setFill(energy/energyMax);
@@ -158,7 +169,31 @@ public class MainGameScreen implements Screen, InputProcessor {
         drawEntities();
 
         game.batch.end();
-        gui.counterText.text = String.format("Recreation Activities done: " + recActivity + "\nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        if (fadeOut)
+        {
+            shapeRenderer.setProjectionMatrix(roomCam.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            lockMovement = true;
+            FadePerc += delta;
+
+
+            shapeRenderer.setColor(new Color(0,0,0,FadePerc));
+            shapeRenderer.rect(-1000,-1000,5000, 5000);
+            if (FadePerc > 1)
+            {
+                FinishReset();
+                camera.update();
+                fadeOut=false;
+                FadePerc = 0;
+            }
+            shapeRenderer.end();
+
+        }
+
+
+        gui.counterText.text = String.format("Recreation Activities done: \nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
         gui.render(game.batch);
         drawGameTime();
     }
@@ -169,8 +204,6 @@ public class MainGameScreen implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(this);
         lockTime = false;
     }
-
-
 
     /**
      * Renders the game world elements including the map and player.
@@ -226,23 +259,30 @@ public class MainGameScreen implements Screen, InputProcessor {
         }
 
 
-        if (roomMap != null && !roomMap.showing && space)
+        if (roomMap != null && !roomMap.showing && space && !(roomMap instanceof Gym))
         {
             roomMap.showing = true;
             lockMovement = true;
             space = false;
 
-        } else if (roomMap != null && roomMap.showing)
+        } else if ((roomMap != null && roomMap.showing) || (roomMap instanceof Gym))
         {
             if (roomMap.interact() && space)
             {
                 switch(roomMap.activity)
                 {
                     case EXIT:
+                        game.screenManager.setScreen(ScreenType.GAME_SCREEN);
                         roomMap.showing = false;
                         lockMovement = false;
                         break;
+                    case SLEEP:
+                        resetDay();
+
+                        break;
                     case EAT:
+                        energy+=30;
+                        if (energy > energyMax) energy = energyMax;
                         game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
                         roomMap.showing = false;
                         lockMovement = false;
@@ -253,7 +293,10 @@ public class MainGameScreen implements Screen, InputProcessor {
                         roomMap.lockMovement = true;
                         break;
                     case EXCERCISE:
-                        game.screenManager.setScreen(ScreenType.GYM,1d);
+                        game.screenManager.setScreen(ScreenType.GYM,1);
+                        break;
+                    case NONE:
+                        game.screenManager.setScreen(ScreenType.PONG_MINI_GAME,1);
                         break;
 
                 }
@@ -310,32 +353,38 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         // Ensure the hour cycles through the active hours correctly (8 AM to 12 AM)
         if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
-            if (dayNum == 7)
-            {
-                int score = EventManager.getScore(activities);
-                Gdx.app.log("score: ", String.valueOf(score));
-                Gdx.app.log("Acts: ", String.valueOf(activities));
-                game.screenManager.setScreen(ScreenType.LEADERBOARD);
-                game.screenManager.setScreen(ScreenType.END_SCREEN);
 
-            }
             resetDay();
         }
-        if (dayNum > 7)
-        {
-            game.screenManager.setScreen(ScreenType.LEADERBOARD);
-            game.screenManager.setScreen(ScreenType.END_SCREEN);
-        }
+
+
 
     }
 
     private void resetDay(){
+        fadeOut = true;
+        lockMovement = true;
+        if (roomMap instanceof Accom) ((Accom) roomMap).freeze = true;
         currentHour = 8;
         dayNum++;
         timeElapsed = 0;
-        energyCounter += 4;
-        if (energyCounter > 10) energyCounter = 10;
+        if (dayNum == 8)
+        {
+            score = game.eventM.getScore();
+            Gdx.app.log("score: ", String.valueOf(score));
+            Gdx.app.log("Acts: ", String.valueOf(activities));
+            game.screenManager.setScreen(ScreenType.LEADERBOARD);
+
+        }
+
     }
+
+    private void FinishReset()
+    {
+        if (roomMap instanceof Accom) {((Accom) roomMap).freeze = false;energy = energyMax;}
+        else lockMovement = false;
+    }
+
 
     /**
      * Draws the game time display.
@@ -423,6 +472,7 @@ public class MainGameScreen implements Screen, InputProcessor {
     public void dispose() {
         player.dispose();
         font.dispose();
+        roomMap = new CS(game,camera);
         roomMap.dispose();
         csRoom.dispose();
         piaRoom.dispose();
@@ -435,6 +485,8 @@ public class MainGameScreen implements Screen, InputProcessor {
         if (i == Input.Keys.SPACE) {
             space = true;
         }
+
+
         return false;
     }
 

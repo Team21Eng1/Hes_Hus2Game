@@ -1,91 +1,134 @@
 package com.main.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
-import com.badlogic.gdx.InputProcessor;
-import com.main.gui.TextBox;
+import com.main.gui.Button;
 import com.main.utils.ScreenType;
-import com.main.screens.LeaderboardScreen;
 
+/**
+ * The MainControlScreen class provides a visual representation of control instructions
+ * for the game, alongside a back button to navigate back to the main menu.
+ * It implements both the Screen and InputProcessor interfaces from libGDX,
+ * handling rendering and input events within the control screen context.
+ */
 public class TutorialScreen implements Screen, InputProcessor {
-
     Main game;
-
-    // Need to add a leaderboard button texture
-    Texture heslingtonHustleLabel, playButton, controlsButton, settingsButton, exitButton, leaderButton;
-
-    int heslingtonHustleLabelHeight, playButtonHeight, controlsButtonHeight, settingsButtonHeight, exitButtonHeight, leaderButtonHeight;
-    int heslingtonHustleLabelWidth, playButtonWidth, controlsButtonWidth, settingsButtonWidth, exitButtonWidth, leaderButtonWidth;
-
-    int x;
-    float heslingtonHustleLabelX;
-    float heslingtonHustleLabelY, playButtonY, controlsButtonY, settingsButtonY, exitButtonY, leaderButtonY;
-
-    boolean exitFlag;
-    public TextBox tutorial;
     BitmapFont font;
+    String objective;
+    private final float zoom = 1f;
+    private Button backButton,controlLabel,controls,playButton;
+    // X and Y coordinates
+    private float instructionX, instructionY;
+    // Buttons dimensions
+    private float instructionGap;
 
     /**
-     * Constructs a MainMenuScreen with the specified game instance.
-     * Initializes UI elements and calculates their positions.
+     * Constructor for MainControlScreen.
+     * Initializes the screen with game controls instructions, sets up textures for display elements,
+     * and configures input processing.
      *
-     * @param game the game instance this screen belongs to.
+     * @param game The main game object that this screen is a part of.
      */
     public TutorialScreen(Main game) {
         this.game = game;
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        loadTextures();
-        calculateDimensions();
-        calculatePositions();
-        tutorial = new TextBox("Welcome to Heslington Hustle here are some tips before you start playing",400,800,20,400,font);
-    }
 
-    /**
-     * Loads textures for UI elements from the assets directory.
-     */
-    private void loadTextures() {
-        playButton = new Texture("menu_gui/play_button.png");
-    }
+        this.backButton = new Button(new Texture("settings_gui/back_button.png"),(game.screenWidth)/2 -100, 100,5);
+        this.backButton.Centre();
+        this.playButton = new Button(new Texture("menu_gui/play_button.png"),(game.screenWidth)/2+ 100, 100,5);
+        this.playButton.Centre();
+        this.controlLabel = new Button(new Texture("controls_gui/controls_label.png"),(game.screenWidth)/2,game.screenHeight-80,6);
+        this.controlLabel.Centre();
+        this.controls = new Button(new Texture("controls_gui/controls.png"),(game.screenWidth)/2-200,game.screenHeight/2-50,5);
+        this.controls.Centre();
 
-    /**
-     * Calculates the dimensions of buttons based on their textures.
-     */
-    private void calculateDimensions() {
-        playButtonHeight = (int) (playButton.getHeight() * 10 * game.scaleFactorY);
-        playButtonWidth = (int) (playButton.getWidth() * 10 * game.scaleFactorX);
 
-    }
+        font.getData().setScale(1.5f * game.scaleFactorX, 1.5f * game.scaleFactorY);
+        instructionGap = 87 * game.scaleFactorY;
 
-    /**
-     * Calculates the positions of buttons to be drawn on the screen.
-     */
-    private void calculatePositions() {
+        instructionY = game.screenHeight / 1.45f;
+        instructionX = game.screenWidth / 2f - 90 * game.scaleFactorX;
 
-        x = (int) ((game.screenWidth - playButtonWidth) / 2f);
-        playButtonY = game.screenHeight - playButtonHeight * 2.25f;
+        objective = "Welcome to Heslington Hustle! You are a second-year Computer Science student with exams in only 7 days. Explore the map, \n" +
+                "and interact with buildings to eat, study, sleep and have fun. To get a good grade, you need to balance hours of studying with \n" +
+                "self-care and recreation. Good luck!";
+
 
     }
+
+
+
+
 
     @Override
     public void show() {
-        game.batch.setProjectionMatrix(game.defaultCamera.combined);
         Gdx.input.setInputProcessor(this);
+        game.batch.setProjectionMatrix(game.defaultCamera.combined);
     }
 
+    /**
+     * The main render method for the screen. Called every frame and responsible for
+     * drawing the screen's contents.
+     *
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
-        if (exitFlag) return;
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.setProjectionMatrix(game.defaultCamera.combined);
-
         game.batch.begin();
-        tutorial.render(game.batch);
-        game.batch.draw(playButton, x, playButtonY, playButtonWidth, playButtonHeight);
+        font.draw(game.batch, objective, 0, game.screenHeight-140, game.screenWidth, Align.center, false);
+        float instructionY = this.instructionY;
+        String[] instructions = {
+                "Up - Move forward",
+                "Left - Turn left",
+                "Right - Turn right",
+                "Down - Move backward",
+                "Shift - Sprint",
+                "Esc - Pause"
+        };
+
+        for (String instruction : instructions) {
+            font.draw(game.batch, instruction, instructionX, instructionY);
+            instructionY -= instructionGap; // Spacing between instructions
+        }
+        controlLabel.render(game.batch);
+        controls.render(game.batch);
+        backButton.render(game.batch);
+        playButton.render(game.batch);
+
         game.batch.end();
+    }
+
+    /**
+     * Handles touch down input events. Specifically, checks if the back button is pressed
+     * and navigates back to the main menu screen.
+     *
+     * @param touchX The x-coordinate of the touch, in screen coordinates.
+     * @param touchY The y-coordinate of the touch, in screen coordinates.
+     * @param pointer The pointer for the event.
+     * @param button The button pressed.
+     * @return true if the event was handled, false otherwise.
+     */
+    public boolean touchDown(int touchX, int touchY, int pointer, int button) {
+        touchY = (game.screenHeight - touchY);
+
+        if (backButton.overlap(new Vector2(touchX,touchY),zoom)) {
+            game.screenManager.setScreen(ScreenType.MAIN_MENU);
+            game.audio.buttonClickedSoundActivate();
+        }
+        if (playButton.overlap(new Vector2(touchX,touchY),zoom)) {
+            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+            game.audio.buttonClickedSoundActivate();
+        }
+        return true;
     }
 
     @Override
@@ -101,17 +144,6 @@ public class TutorialScreen implements Screen, InputProcessor {
     @Override
     public boolean keyTyped(char c) {
         return false;
-    }
-
-    public boolean touchDown(int touchX, int touchY, int pointer, int button) {
-        touchY = game.screenHeight - touchY;
-
-        if (touchX >= x && touchX <= x + playButtonWidth &&
-                touchY >= playButtonY && touchY <= playButtonY + playButtonHeight) {
-            game.audio.buttonClickedSoundActivate();
-            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
-        }
-        return true;
     }
 
     @Override
@@ -135,14 +167,13 @@ public class TutorialScreen implements Screen, InputProcessor {
     }
 
     @Override
-    public boolean scrolled(float v, float v1) {
-        return false;
+    public boolean scrolled(float amountX, float amountY) {
+        // Implement scrolling behavior if needed
+        return false; // Return false if the event was not handled
     }
 
     @Override
     public void resize(int width, int height) {
-        calculateDimensions();
-        calculatePositions();
     }
 
     @Override
@@ -157,10 +188,12 @@ public class TutorialScreen implements Screen, InputProcessor {
 
     @Override
     public void hide() {
+
     }
 
     @Override
     public void dispose() {
-        playButton.dispose();
+        font.dispose();
     }
+
 }

@@ -4,9 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventManager {
+    ArrayList<ActivityType> activities;
+    ArrayList<Integer> scores;
+    ArrayList<Float> times;
+    ArrayList<Integer> days;
+    public int curDay;
+    public EventManager()
+    {
+        this.activities = new ArrayList<ActivityType>();
+        this.scores = new ArrayList<Integer>();
+        this.times = new ArrayList<Float>();
+        this.days = new ArrayList<Integer>();
+        this.curDay = 1;
+    }
+    public void nextDay()
+    {
+        curDay++;
+    }
 
 
-    public static int getScore(List<String> playedEvents) {
+
+    public int getScore() {
         int score = 0;
         int cumulativeEat = 1;
         int cumulativeSleep = 1;
@@ -18,31 +36,27 @@ public class EventManager {
         double recDebuff = 1;
         List<List<String>> days = new ArrayList<>();
         List<String> day = new ArrayList<>();
-        for (String event : playedEvents) {
-            switch (event.toLowerCase()) {
-                case "eat":
+        for (ActivityType event : activities) {
+            switch (event) {
+                case EAT:
                     score += cumulativeEat;
                     cumulativeEat += cumulativeEat;
-                    day.add("eat");
                     break;
-                case "sleep":
+                case SLEEP:
                     score += cumulativeSleep;
                     cumulativeSleep += cumulativeSleep;
-                    day.add("sleep");
                     days.add(day);
                     day.clear();
                     break;
-                case "exercise":
+                case EXCERCISE:
                     score += 10;
                     recCount += 1;
                     score -= 5;
-                    day.add("exercise");
                     break;
-                case "study":
+                case STUDY:
                     studyTotal += 10;
                     studyCount += 1;
                     score += 10;
-                    day.add("study");
                     break;
                 default:
                     score += 1;
@@ -100,8 +114,15 @@ public class EventManager {
             returns.add(0);
         }
         return returns;
-
-
     }
+
+    public void logEvent(ActivityType activity, int score)
+    {
+        activities.add(activity);
+        scores.add(score);
+        times.add(0.0f);
+        days.add(curDay);
+    }
+
 }
 

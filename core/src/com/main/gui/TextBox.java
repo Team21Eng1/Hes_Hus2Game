@@ -16,10 +16,11 @@ public class TextBox {
     {
         this.text = text;
         this.height = height;
-        this.width = width;
+
         this.font = font;
         this.xPos = xPos;
         this.yPos = yPos;
+        this.width = text.length()*5;
         font.getData().setScale(1);
     }
     public void scaleFont(float scale)
@@ -31,6 +32,7 @@ public class TextBox {
     {
         xPos=x;
         yPos=y;
+        Centre();
     }
 
 
@@ -42,6 +44,6 @@ public class TextBox {
     public void Centre()
     {
         xPos = (int) (xPos - width/2);
-        yPos = (int) (yPos - height/2);
+        //yPos = (int) (yPos - height/2);
     }
 }

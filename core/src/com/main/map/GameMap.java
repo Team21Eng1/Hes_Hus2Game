@@ -158,7 +158,6 @@ public class GameMap extends TiledMap {
 
     
     public void dispose() {
-        gameMap.dispose();
-        tiledMapRenderer.dispose();
+
     }
 }

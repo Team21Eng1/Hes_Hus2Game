@@ -42,6 +42,7 @@ public class Player extends Entity implements Disposable {
     public static int spriteY = 23;
 
     public ParticleSys PS;
+    private boolean Rot;
 
     /**
      * Constructs a new Player instance.
@@ -55,6 +56,7 @@ public class Player extends Entity implements Disposable {
         this.game = game;
         this.gameMap = gameMap;
         this.camera = camera;
+        this.Rot = false;
 
 
 
@@ -110,6 +112,7 @@ public class Player extends Entity implements Disposable {
             targY = worldY + (float) (normalizedSpeed * Gdx.graphics.getDeltaTime());
             currentAnimation = walkUpAnimation;
             setDir('U');
+
             setMoving(true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
@@ -165,6 +168,13 @@ public class Player extends Entity implements Disposable {
 
 
     }
+
+    public void setRot(boolean set)
+    {
+        Rot = set;
+    }
+
+
     public void camUpdate()
     {
 
@@ -271,8 +281,7 @@ public class Player extends Entity implements Disposable {
     }
 
     public void dispose(){
-        idleSheet.dispose();
-        walkSheet.dispose();
+
     }
     @Override
     public int getSpriteX()
