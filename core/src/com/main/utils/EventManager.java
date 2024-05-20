@@ -123,14 +123,37 @@ public class EventManager {
             }
         }
 
+        // Achievements for eating
+        if (eatCount >= 10) {
+            achievements.add("Foodie I - Completed the eat event 10 times");
+        }
+        if (eatCount >= 20) {
+            achievements.add("Foodie II - Completed the eat event 20 times");
+        }
         if (eatCount >= 25) {
-            achievements.add("Foodie - Completed the eat event 25 times");
+            achievements.add("Foodie III - Completed the eat event 25 times");
+        }
+
+        // Achievements for exercising
+        if (exerciseCount >= 5) {
+            achievements.add("Gym Addict I - Completed the exercise event 10 times");
         }
         if (exerciseCount >= 10) {
-            achievements.add("Gym Addict - Completed the exercise event 25 times");
+            achievements.add("Gym Addict II - Completed the exercise event 20 times");
+        }
+        if (exerciseCount >= 15) {
+            achievements.add("Gym Addict III - Completed the exercise event 25 times");
+        }
+
+        // Achievements for studying
+        if (studyCount >= 5) {
+            achievements.add("Bookworm I - Completed the study event 10 times");
         }
         if (studyCount >= 10) {
-            achievements.add("Bookworm - Completed the study event 25 times");
+            achievements.add("Bookworm II - Completed the study event 20 times");
+        }
+        if (studyCount >= 15) {
+            achievements.add("Bookworm III - Completed the study event 25 times");
         }
 
         // Check if no achievements have been unlocked
