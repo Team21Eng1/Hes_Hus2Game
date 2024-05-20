@@ -68,10 +68,11 @@ public class MainGameScreen implements Screen, InputProcessor {
     private int energyCounter, duration, dayNum, recActivity, studyHours, mealCount, currentHour;
     private float timeElapsed, fadeTime, minShade;
     private boolean fadeOut, lockTime, lockMovement, lockPopup, resetPos, popupVisible, showMenu;
+    int finalScore;
+    List<String> finalAchievements = new ArrayList<>();
 
 
     private List<String> activities = new ArrayList<>();
-
 
     private Student student;
     float timer,t;
@@ -506,17 +507,16 @@ public class MainGameScreen implements Screen, InputProcessor {
         if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
             if (dayNum == 7)
             {
-                int score = EventManager.getScore(activities);
-                game.screenManager.setScreen(ScreenType.LEADERBOARD);
-                game.screenManager.setScreen(ScreenType.END_SCREEN);
+                finalizeGameSession();
+                game.screenManager.setScreen(ScreenType.SAVE);
 
             }
             resetDay();
         }
         if (dayNum > 7)
         {
-            game.screenManager.setScreen(ScreenType.LEADERBOARD);
-            game.screenManager.setScreen(ScreenType.END_SCREEN);
+            finalizeGameSession();
+            game.screenManager.setScreen(ScreenType.SAVE);
         }
 
     }
@@ -720,6 +720,35 @@ public class MainGameScreen implements Screen, InputProcessor {
         }
 
         return true;
+    }
+
+    /**
+     * Calculates the final score for the game session based on the recorded activities.
+     * @return The final score as an integer.
+     */
+    public int getFinalScore() {
+        return EventManager.getScore(activities);
+    }
+
+    /**
+     * Retrieves the list of achievements based on the activities performed during the game session.
+     * @return A list of strings describing the achievements unlocked.
+     */
+    public List<String> getFinalAchievements() {
+        return EventManager.getAchievements(activities);
+    }
+
+    // Example method that might be called when the game transitions to an end screen or similar:
+    public void finalizeGameSession() {
+        int finalScore = getFinalScore();
+        List<String> finalAchievements = getFinalAchievements();
+
+        // Assuming your screen manager can store these values:
+        game.screenManager.setScore(finalScore);
+        game.screenManager.setAchievements(finalAchievements);
+
+        // Example of switching to a leaderboard or achievements screen
+        game.screenManager.setScreen(ScreenType.LEADERBOARD);
     }
 
     @Override

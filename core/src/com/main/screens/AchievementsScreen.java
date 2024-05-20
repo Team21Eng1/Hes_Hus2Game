@@ -7,54 +7,31 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.files.FileHandle;
 import com.main.Main;
+import com.main.utils.EventManager;
+import com.main.utils.ScreenManager;
 import com.main.utils.ScreenType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class LeaderboardScreen implements Screen, InputProcessor {
+public class AchievementsScreen implements Screen, InputProcessor {
     Main game;
     BitmapFont font, titleFont;
-    List<String[]> highScores;
+    List<String> achievements;
     private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
-    private float titleY;
+    private float displayTextY, titleY;
 
-    public LeaderboardScreen(Main game) {
+    public AchievementsScreen(Main game) {
         this.game = game;
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         titleFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         backButton = new Texture("settings_gui/back_button.png");
-        highScores = new ArrayList<>();
-        loadHighScores();
+        achievements = game.screenManager.getAchievements();
 
         calculateDimensions();
         calculatePositions();
         titleFont.getData().setScale(3.0f * game.scaleFactorX, 3.0f * game.scaleFactorY);
-    }
-
-    private void loadHighScores() {
-        FileHandle file = Gdx.files.local("leaderboard.csv");
-        if (file.exists()) {
-            String[] scoreEntries = file.readString().split("\\r?\\n");
-            for (int i = 1; i < scoreEntries.length; i++) {
-                String[] parts = scoreEntries[i].split(",");
-                if (parts.length == 2) {
-                    highScores.add(new String[] { parts[0].trim(), parts[1].trim() });
-                }
-            }
-            Collections.sort(highScores, new Comparator<String[]>() {
-                @Override
-                public int compare(String[] o1, String[] o2) {
-                    return Integer.compare(Integer.parseInt(o2[1]), Integer.parseInt(o1[1]));
-                }
-            });
-            highScores = highScores.size() > 10 ? highScores.subList(0, 10) : highScores; // Limit to top 10 scores
-        }
     }
 
     private void calculateDimensions() {
@@ -66,6 +43,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     private void calculatePositions() {
         backButtonX = (game.screenWidth - backButtonWidth) / 2f;
         backButtonY = game.screenHeight / 6f - 120 * game.scaleFactorY;
+        displayTextY = game.screenHeight / 2f - 200;
         titleY = game.screenHeight - 100;
     }
 
@@ -79,35 +57,17 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     public void render(float delta) {
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.begin();
-        titleFont.draw(game.batch, "Leaderboard", 0, titleY, game.screenWidth, Align.center, false);
-        float y = titleY - 200;
-        for (String[] scoreEntry : highScores) {
-            String displayText = scoreEntry[0] + ": " + scoreEntry[1];
-            font.draw(game.batch, displayText, 0, y, game.screenWidth, Align.center, false);
-            y -= font.getLineHeight();
+        titleFont.draw(game.batch, "Achievements", 0, titleY, game.screenWidth, Align.center, false);
+        float y = displayTextY;
+        for (String achievement : achievements) {
+            font.draw(game.batch, achievement, 0, y, game.screenWidth, Align.center, false);
+            y -= font.getLineHeight() + 20;
         }
         game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
         game.batch.end();
     }
 
-    private String formatScoreEntry(String scoreEntry) {
-        String[] parts = scoreEntry.split(",");
-        if (parts.length == 2) {
-            return parts[0].trim() + ": " + parts[1].trim();
-        }
-        return scoreEntry;
-    }
-
-    /**
-     * Handles touch down input events. Specifically, checks if the back button is pressed
-     * and navigates back to the main menu screen.
-     *
-     * @param touchX The x-coordinate of the touch, in screen coordinates.
-     * @param touchY The y-coordinate of the touch, in screen coordinates.
-     * @param pointer The pointer for the event.
-     * @param button The button pressed.
-     * @return true if the event was handled, false otherwise.
-     */
+    @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button) {
         touchY = (game.screenHeight - touchY);
 
