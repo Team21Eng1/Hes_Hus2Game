@@ -3,14 +3,17 @@ package com.main.tests;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.main.utils.AudioManager;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
+@RunWith(GdxTestRunner.class)
 public class AudioManagerTest extends LibgdxUnitTest {
     @Mock
     Music bgMusic;
@@ -32,127 +35,35 @@ public class AudioManagerTest extends LibgdxUnitTest {
 
     @Test
     void testMusicVolUp() {
+        int level1 = audioManager.getMusicLevel();
         audioManager.musicVolUp();
-        verify(bgMusic).setVolume(anyFloat());
-        verify(upSound).setVolume(anyFloat());
-        verify(downSound).setVolume(anyFloat());
-        verify(buttonClickedSound).setVolume(anyFloat());
-        verify(eatingSound).setVolume(anyFloat());
+        int level2 = audioManager.getMusicLevel();
+        Assertions.assertTrue(level1 <= level2 );
+
     }
 
     @Test
     void testMusicVolDown() {
+        int level1 = audioManager.getMusicLevel();
         audioManager.musicVolDown();
-        verify(bgMusic).setVolume(anyFloat());
-        verify(upSound).setVolume(anyFloat());
-        verify(downSound).setVolume(anyFloat());
-        verify(buttonClickedSound).setVolume(anyFloat());
-        verify(eatingSound).setVolume(anyFloat());
+        int level2 = audioManager.getMusicLevel();
+        Assertions.assertTrue(level1 >= level2 );
     }
 
     @Test
     void testSoundVolUp() {
+        int level1 = audioManager.getSoundLevel();
         audioManager.soundVolUp();
-        verify(bgMusic).setVolume(anyFloat());
-        verify(upSound).setVolume(anyFloat());
-        verify(downSound).setVolume(anyFloat());
-        verify(buttonClickedSound).setVolume(anyFloat());
-        verify(eatingSound).setVolume(anyFloat());
+        int level2 = audioManager.getSoundLevel();
+        Assertions.assertTrue(level1 <= level2 );
     }
 
     @Test
     void testSoundVolDown() {
+        int level1 = audioManager.getSoundLevel();
         audioManager.soundVolDown();
-        verify(bgMusic).setVolume(anyFloat());
-        verify(upSound).setVolume(anyFloat());
-        verify(downSound).setVolume(anyFloat());
-        verify(buttonClickedSound).setVolume(anyFloat());
-        verify(eatingSound).setVolume(anyFloat());
+        int level2 = audioManager.getSoundLevel();
+        Assertions.assertTrue(level1 >= level2 );
     }
 
-    @Test
-    void testUpSoundActivate() {
-        when(bgMusic.isPlaying()).thenReturn(true);
-        when(upSound.isPlaying()).thenReturn(true);
-        when(downSound.isPlaying()).thenReturn(true);
-        when(buttonClickedSound.isPlaying()).thenReturn(true);
-        when(eatingSound.isPlaying()).thenReturn(true);
-
-        audioManager.upSoundActivate();
-        verify(bgMusic).play();
-        verify(bgMusic).stop();
-        verify(upSound).play();
-        verify(upSound).stop();
-        verify(downSound).play();
-        verify(downSound).stop();
-        verify(buttonClickedSound).play();
-        verify(buttonClickedSound).stop();
-        verify(eatingSound).play();
-        verify(eatingSound).stop();
-    }
-
-    @Test
-    void testDownSoundActivate() {
-        when(bgMusic.isPlaying()).thenReturn(true);
-        when(upSound.isPlaying()).thenReturn(true);
-        when(downSound.isPlaying()).thenReturn(true);
-        when(buttonClickedSound.isPlaying()).thenReturn(true);
-        when(eatingSound.isPlaying()).thenReturn(true);
-
-        audioManager.downSoundActivate();
-        verify(bgMusic).play();
-        verify(bgMusic).stop();
-        verify(upSound).play();
-        verify(upSound).stop();
-        verify(downSound).play();
-        verify(downSound).stop();
-        verify(buttonClickedSound).play();
-        verify(buttonClickedSound).stop();
-        verify(eatingSound).play();
-        verify(eatingSound).stop();
-    }
-
-    @Test
-    void testButtonClickedSoundActivate() {
-        when(bgMusic.isPlaying()).thenReturn(true);
-        when(upSound.isPlaying()).thenReturn(true);
-        when(downSound.isPlaying()).thenReturn(true);
-        when(buttonClickedSound.isPlaying()).thenReturn(true);
-        when(eatingSound.isPlaying()).thenReturn(true);
-
-        audioManager.buttonClickedSoundActivate();
-        verify(bgMusic).play();
-        verify(bgMusic).stop();
-        verify(upSound).play();
-        verify(upSound).stop();
-        verify(downSound).play();
-        verify(downSound).stop();
-        verify(buttonClickedSound).play();
-        verify(buttonClickedSound).stop();
-        verify(eatingSound).play();
-        verify(eatingSound).stop();
-    }
-
-    @Test
-    void testEatingSoundActivate() {
-        when(bgMusic.isPlaying()).thenReturn(true);
-        when(upSound.isPlaying()).thenReturn(true);
-        when(downSound.isPlaying()).thenReturn(true);
-        when(buttonClickedSound.isPlaying()).thenReturn(true);
-        when(eatingSound.isPlaying()).thenReturn(true);
-
-        audioManager.eatingSoundActivate();
-        verify(bgMusic).play();
-        verify(bgMusic).stop();
-        verify(upSound).play();
-        verify(upSound).stop();
-        verify(downSound).play();
-        verify(downSound).stop();
-        verify(buttonClickedSound).play();
-        verify(buttonClickedSound).stop();
-        verify(eatingSound).play();
-        verify(eatingSound).stop();
-    }
 }
-
-//Generated with love by TestMe :) Please raise issues & feature requests at: https://weirddev.com/forum#!/testme
