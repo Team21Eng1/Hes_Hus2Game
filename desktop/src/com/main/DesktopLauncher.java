@@ -19,7 +19,7 @@ public class DesktopLauncher {
 		int windowX = 0;
 		if (vidMode != null) {windowX = vidMode.width();}
 		int windowY = displayMode.height-90;
-		config.setWindowedMode(windowX, windowY);
+		config.setWindowedMode(windowX, windowY);7
 
 		// General window configuration
 		config.setWindowPosition(0, 40);
