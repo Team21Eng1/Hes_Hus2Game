@@ -79,14 +79,55 @@ project(":desktop") {
     }
 }
 
+
 project(":tests"){
-    apply plugin:  "java-library"
+    apply plugin: "java-library"
+    apply plugin: "java"
+    apply plugin: "jacoco"
+
+    repositories {
+        mavenCentral()
+    }
+
 
     dependencies {
         implementation project(":core")
-        implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-        implementation 'org.mockito:mockito-testng:0.5.2'
-        runtimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+        implementation(platform('org.junit:junit-bom:5.10.2'))
+        implementation('org.junit.jupiter:junit-jupiter')
+        implementation('junit:junit:4.13')
+        runtimeOnly('org.junit.platform:junit-platform-launcher')
+        implementation ('org.mockito:mockito-core:5.11.0')
+        implementation ('org.mockito:mockito-core:5.11.0')
+        implementation ('com.badlogicgames.gdx:gdx-backend-headless:1.12.1')
+
+        testImplementation(platform('org.junit:junit-bom:5.10.2'))
+        testImplementation('org.junit.jupiter:junit-jupiter')
+        testImplementation('junit:junit:4.13')
+        testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+        testImplementation ('org.mockito:mockito-core:5.11.0')
+        testImplementation ('org.mockito:mockito-core:5.11.0')
+        testImplementation ('com.badlogicgames.gdx:gdx-backend-headless:1.12.1')
+
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+    jacocoTestReport {
+        dependsOn test
+        sourceSets project(':core').sourceSets.main
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: ['**/*Tests.*', '**/GdxTestRunner.*'])
+            }))
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
     }
 }
+
