@@ -272,11 +272,14 @@ public class MainGameScreen implements Screen, InputProcessor {
                 switch(roomMap.activity)
                 {
                     case EXIT:
-                        game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+                        game.screenManager.setScreen(ScreenType.LEADERBOARD);
+                        //game.screenManager.setScreen(ScreenType.GAME_SCREEN);
                         roomMap.showing = false;
                         lockMovement = false;
                         break;
                     case SLEEP:
+                        if (time)
+                        game.eventM.curDay++;
                         resetDay();
 
                         break;

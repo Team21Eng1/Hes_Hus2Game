@@ -2,35 +2,65 @@ package com.main.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.files.FileHandle;
 import com.main.Main;
+import com.main.gui.Button;
 import com.main.utils.ScreenType;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.badlogic.gdx.Input.Keys.ENTER;
+
 public class LeaderboardScreen implements Screen, InputProcessor {
     Main game;
     BitmapFont font, titleFont;
     List<String[]> highScores;  // List to hold score entries as arrays
-    private final Texture backButton;
-    private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
+    private String UserName;
+    private boolean inputName = false;
     private float titleY;
+    private OrthographicCamera cam;
+    private Button backButton,backButton2;
+    float timer,t;
+    char inputCap;
 
     public LeaderboardScreen(Main game) {
         this.game = game;
         font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         titleFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
-        backButton = new Texture("settings_gui/back_button.png");
         highScores = new ArrayList<>();
         loadHighScores();
+        UserName = "NAME";
+        this.cam = new OrthographicCamera();
+        this.cam = new OrthographicCamera();
+        this.cam.setToOrtho(false, this.game.screenWidth, this.game.screenHeight);
+        this.cam.rotate(new Vector3(0,0,1),8.5f);
+
+        if (game.eventM.curDay == 8) {
+            inputName = true;
+            backButton = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2 - 200,game.screenHeight/8,5);
+            backButton.Centre();
+            backButton2 = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2 + 200,game.screenHeight/8,5);
+            backButton2.Centre();
+            timer = 0.6f;
+        } else {
+            backButton = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2,game.screenHeight/8,5);
+            backButton.Centre();
+        }
+
 
         calculateDimensions();
         calculatePositions();
@@ -60,13 +90,9 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
     private void calculateDimensions() {
         font.getData().setScale(1.5f * game.scaleFactorX, 1.5f * game.scaleFactorY);
-        backButtonWidth = 200 * game.scaleFactorX;
-        backButtonHeight = 100 * game.scaleFactorY;
     }
 
     private void calculatePositions() {
-        backButtonX = (game.screenWidth - backButtonWidth) / 2f;
-        backButtonY = game.screenHeight / 6f - 120 * game.scaleFactorY;
         titleY = game.screenHeight - 100;  // Position for the title
     }
 
@@ -74,29 +100,68 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     public void show() {
         Gdx.input.setInputProcessor(this);
         game.batch.setProjectionMatrix(game.defaultCamera.combined);
+
     }
 
     @Override
     public void render(float delta) {
+        game.batch.setProjectionMatrix(cam.combined);
         ScreenUtils.clear(0.3f, 0.55f, 0.7f, 1);
         game.batch.begin();
+        font.getData().setScale(2);
         titleFont.draw(game.batch, "Leaderboard", 0, titleY, game.screenWidth, Align.center, false);
-        float y = titleY - 200; // Adjust starting position for scores to accommodate the title
+        float y = titleY - 100; // Adjust starting position for scores to accommodate the title
         for (String[] scoreEntry : highScores) {
-            String displayText = scoreEntry[0] + ": " + scoreEntry[1];
-            font.draw(game.batch, displayText, 0, y, game.screenWidth, Align.center, false);
+            String displayText = String.valueOf(highScores.indexOf(scoreEntry)+1) + String.format(". %06d",Integer.valueOf(scoreEntry[1])) +"     "+ scoreEntry[0];
+            font.draw(game.batch, displayText, game.screenWidth/3, y, game.screenWidth, Align.topLeft, false);
             y -= font.getLineHeight(); // Move to the next line
         }
-        game.batch.draw(backButton, backButtonX, backButtonY, backButtonWidth, backButtonHeight);
+        if (game.eventM.curDay==8) {
+            renderUserIn(y,12345);
+            backButton2.render(game.batch);
+            t+=delta;
+            if (t>timer) {t=0; if (inputCap == '<') {  inputCap = ' ';} else {inputCap = '<';}}
+        }
+        backButton.render(game.batch);
+
         game.batch.end();
+        font.getData().setScale(1);
+    }
+    public void renderUserIn(float lnHeight,int score)
+    {
+        if (inputName){font.draw(game.batch,"     "+ String.format("%06d",Integer.valueOf(game.eventM.getScore())) +"     " + UserName + inputCap ,game.screenWidth/3, lnHeight-20, game.screenWidth, Align.topLeft, false);}
+
     }
 
-    private String formatScoreEntry(String scoreEntry) {
-        String[] parts = scoreEntry.split(",");
-        if (parts.length == 2) {
-            return parts[0].trim() + ": " + parts[1].trim(); // Format as "Name: Score"
+    private InputStream formatScoreEntry(int score, String user) {
+        InputStream stream = new ByteArrayInputStream(("\n" + user + ", " + score).getBytes(StandardCharsets.UTF_8));
+        return stream; // Format as "Name: Score"
+    }
+
+    private void writeUpdatedLB()
+    {
+        FileHandle file = Gdx.files.local("leaderboard.csv");
+        if (file.exists()) {
+            file.write(formatScoreEntry(1,UserName),true);
+            highScores.clear();
+            String[] scoreEntries = file.readString().split("\\r?\\n");
+            for (int i = 1; i < scoreEntries.length; i++) { // Skip the header
+                String[] parts = scoreEntries[i].split(",");
+                if (parts.length == 2) {
+                    highScores.add(new String[] { parts[0].trim(), parts[1].trim() });
+                }
+            }
+            // Sort the scores in descending order and take the top 10
+            Collections.sort(highScores, new Comparator<String[]>() {
+                @Override
+                public int compare(String[] o1, String[] o2) {
+                    int score1 = Integer.parseInt(o1[1]);
+                    int score2 = Integer.parseInt(o2[1]);
+                    return Integer.compare(score2, score1); // Compare in descending order
+                }
+            });
+            highScores = highScores.size() > 10 ? highScores.subList(0, 10) : highScores; // Limit to top 10 scores
         }
-        return scoreEntry; // Return original if not in expected format
     }
 
     /**
@@ -112,8 +177,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     public boolean touchDown(int touchX, int touchY, int pointer, int button) {
         touchY = (game.screenHeight - touchY);
 
-        if (touchX >= backButtonX && touchX <= backButtonX + backButtonWidth &&
-                touchY >= backButtonY && touchY <= backButtonY + backButtonHeight) {
+        if (backButton.overlap(new Vector2(touchX,touchY),1)) {
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
             game.audio.buttonClickedSoundActivate();
         }
@@ -122,7 +186,15 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int i) {
+        if (i == ENTER && !UserName.isEmpty()) {
+            inputName = false;
+            inputCap = '#';
+            timer = 0;
+            writeUpdatedLB();
+            game.eventM.reset();
+        }
         return false;
+
     }
 
     @Override
@@ -130,9 +202,18 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         return false;
     }
 
+
     @Override
-    public boolean keyTyped(char c) {
-        return false;
+    public boolean keyTyped(char character) {
+        if (inputName) {
+            if (character == '\b' && !UserName.isEmpty()) { // Handles backspace
+                UserName = UserName.substring(0, UserName.length() - 1);
+
+            } else if ((Character.isLetter(character) || Character.isDigit(character)) && UserName.length() < 14) {
+                UserName += character;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -184,7 +265,6 @@ public class LeaderboardScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        backButton.dispose();
         font.dispose();
     }
 

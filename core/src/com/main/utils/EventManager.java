@@ -124,5 +124,11 @@ public class EventManager {
         days.add(curDay);
     }
 
+    public void reset()
+    {
+        curDay = 0;
+    }
+
+
 }
 
