@@ -52,6 +52,9 @@ public class Pong implements Screen {
     private Stage stage;
     private BitmapFont customFont, titleFont;
     private Window popupWindow;
+    private static final float GAME_DURATION = 20.0f; // 20 seconds
+    private float timeRemaining;
+    private boolean gameStarted = false;
 
 
     public Pong (Main game) {
@@ -72,23 +75,10 @@ public class Pong implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         setupPopup();
-
-        Texture exitTexture = new Texture("menu_gui/exit_button.png");
-        ImageButton exitButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(exitTexture)));
-        exitButton.getImage().setScale(3f);
-        exitButton.setPosition(Gdx.graphics.getWidth() - exitButton.getWidth() - 65,30);
-
-
-        exitButton.addListener(new ClickListener(){
-            public void clicked (InputEvent event, float x, float y){
-                game.setScreen(new MainGameScreen(game));
-            }
-        });
-        stage.addActor(exitButton);
-
+        timeRemaining = GAME_DURATION;
     }
 
-    private void setupPopup(){
+    private void setupPopup() {
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(new Texture("mini_games/howtoplay.png")));
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = customFont;
@@ -97,14 +87,14 @@ public class Pong implements Screen {
 
         popupWindow = new Window("HOW TO PLAY", windowStyle);
         popupWindow.getTitleLabel().setAlignment(Align.center);
-        popupWindow.setSize(350,350);
-        popupWindow.setPosition(Gdx.graphics.getWidth()/ 2 - 200, Gdx.graphics.getHeight()/2 - 200);
+        popupWindow.setSize(350, 350);
+        popupWindow.setPosition(Gdx.graphics.getWidth() / 2 - 175, Gdx.graphics.getHeight() / 2 - 175);
         popupWindow.align(Align.center);
         popupWindow.setModal(true);
         popupWindow.setVisible(true);
 
-        Label instructions = new Label("Use LEFT and RIGHT arrow keys to move the paddle. Hit the ball with paddle. "+
-                "Click to continue.", new Label.LabelStyle(customFont, Color.WHITE));
+        Label instructions = new Label("Use LEFT and RIGHT arrow keys to move the paddle. Hit the ball with the paddle. " +
+                "Click to start the game.", new Label.LabelStyle(customFont, Color.WHITE));
         instructions.setWrap(true);
         instructions.setAlignment(Align.center);
         popupWindow.add(instructions).expand().fill().center().width(280).pad(10);
@@ -112,21 +102,15 @@ public class Pong implements Screen {
         popupWindow.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                gameStarted = true;
+                timeRemaining = GAME_DURATION; // Initialize the timer
                 popupWindow.remove();
             }
         });
         stage.addActor(popupWindow);
-
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                popupWindow.remove();
-            }
-        }, 5);
     }
 
     public void render(float delta) {
-
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -139,13 +123,16 @@ public class Pong implements Screen {
         shapeRenderer.end();
 
         batch.begin();
-        customFont.draw(batch ,"Score " + score, 10, Gdx.graphics.getHeight() - 10);
+        customFont.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
+        customFont.draw(batch, "Time: " + (int) timeRemaining, Gdx.graphics.getWidth() / 2 - 20, Gdx.graphics.getHeight() - 10);
         customFont.draw(batch, "Use LEFT and RIGHT arrow keys to move the paddle",
                 Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
         batch.end();
 
-        update(delta);
-        draw();
+        if (gameStarted) {
+            update(delta);
+        }
+
         stage.act(delta);
         stage.draw();
     }
@@ -154,6 +141,16 @@ public class Pong implements Screen {
             if (gameOverTimer > 0) {
                 gameOverTimer -= delta;
             }
+            return;
+        }
+
+        if (!gameStarted) return;
+
+        timeRemaining -= delta;
+        if (timeRemaining <= 0) {
+            gameOver = true;
+            gameOverTimer = GAME_OVER_PAUSE;
+            game.setScreen(new MainGameScreen(game));
             return;
         }
         timeElapsed += delta;
@@ -192,12 +189,9 @@ public class Pong implements Screen {
         }
         if (ball.y - ball.radius < paddle.y) {
             resetBall();
-            resetGame();
-            game.setScreen(new MainGameScreen(game));
-
         }
-
     }
+
 
     private void increaseBallSpeed(){
         float speedFactor = 1.6f;
