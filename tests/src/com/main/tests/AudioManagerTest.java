@@ -13,7 +13,9 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
+
 @RunWith(GdxTestRunner.class)
+
 public class AudioManagerTest extends LibgdxUnitTest {
     @Mock
     Music bgMusic;

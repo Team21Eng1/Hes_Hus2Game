@@ -6,6 +6,11 @@ import com.main.Main;
 import com.main.minigames.*;
 import com.main.screens.*;
 
+
+
+import javax.swing.plaf.BorderUIResource;
+import java.util.List;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -18,7 +23,12 @@ public class ScreenManager {
     private final Map<ScreenType, Screen> screensInMemory;
     private Screen curScreen;
     private ScreenType curScreenType;
+
     private Pong pong;
+
+    private int score;
+    private List<String> achievements;
+
 
     /**
      * Initializes the ScreenManager with a reference to the main game class.
@@ -49,6 +59,23 @@ public class ScreenManager {
             screen.dispose();
         }
         screensInMemory.clear();
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setAchievements(List<String> achievements) {
+        this.achievements = achievements;
+    }
+
+    // Methods to retrieve these values:
+    public int getScore() {
+        return score;
+    }
+
+    public List<String> getAchievements() {
+        return achievements;
     }
 
     /**
@@ -112,10 +139,14 @@ public class ScreenManager {
                 return new snakegame(game);
             case LEADERBOARD:
                 return new LeaderboardScreen(game);
+            case SAVE:
+                return new SaveScreen(game);
             case TUTORIAL:
                 return new TutorialScreen(game);
             case GYM:
                 return new GymMini(game,(int) args[0] );
+            case ACHIEVEMENTS:
+                return new AchievementsScreen(game);
         }
         return null;
     }

@@ -50,7 +50,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
     private void loadTextures() {
         heslingtonHustleLabel = new Texture("menu_gui/heslington_hustle_label.png");
         playButton = new Texture("menu_gui/play_button.png");
-        leaderButton = new Texture("menu_gui/play_button.png");
+        leaderButton = new Texture("menu_gui/score_button.png");
         controlsButton = new Texture("menu_gui/controls_button.png");
         settingsButton = new Texture("menu_gui/settings_button.png");
         exitButton = new Texture("menu_gui/exit_button.png");

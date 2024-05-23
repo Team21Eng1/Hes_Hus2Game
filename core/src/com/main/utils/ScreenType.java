@@ -16,4 +16,8 @@ public enum ScreenType {
     LEADERBOARD,
     TUTORIAL,
     GYM
+    HEAD,
+    SAVE,
+    ACHIEVEMENTS
+
 }

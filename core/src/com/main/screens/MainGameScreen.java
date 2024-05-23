@@ -49,13 +49,13 @@ public class MainGameScreen implements Screen, InputProcessor {
 
     private List<String> activities = new ArrayList<>();
 
-
     private Student student1,student2,student3;
     private boolean space;
     private float energyMax, energy;
     public GameMap roomMap,csRoom,piaRoom,accomRoom,gymRoom;
 
     public int score;
+
 
 
     /**
@@ -367,6 +367,7 @@ public class MainGameScreen implements Screen, InputProcessor {
         if (collisionHandler.isTouching("Goodricke_door", player.getHitBox())) return "Goodricke_door";
         return "";
     }
+
     private void resetDay(){
         fadeOut = true;
         freeze();
@@ -449,6 +450,35 @@ public class MainGameScreen implements Screen, InputProcessor {
             }
         }
         return true;
+    }
+
+    /**
+     * Calculates the final score for the game session based on the recorded activities.
+     * @return The final score as an integer.
+     */
+    public int getFinalScore() {
+        return EventManager.getScore(activities);
+    }
+
+    /**
+     * Retrieves the list of achievements based on the activities performed during the game session.
+     * @return A list of strings describing the achievements unlocked.
+     */
+    public List<String> getFinalAchievements() {
+        return EventManager.getAchievements(activities);
+    }
+
+    // Example method that might be called when the game transitions to an end screen or similar:
+    public void finalizeGameSession() {
+        int finalScore = getFinalScore();
+        List<String> finalAchievements = getFinalAchievements();
+
+        // Assuming your screen manager can store these values:
+        game.screenManager.setScore(finalScore);
+        game.screenManager.setAchievements(finalAchievements);
+
+        // Example of switching to a leaderboard or achievements screen
+        game.screenManager.setScreen(ScreenType.LEADERBOARD);
     }
 
     @Override
