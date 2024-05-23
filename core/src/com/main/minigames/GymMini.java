@@ -39,9 +39,8 @@ public class GymMini implements Screen, InputProcessor {
     public GymMini(Main game, int Duration){
         this.game = game;
         this.duration = Duration;
-        Texture tex = new Texture("gymmini/ArmSheet.png");
         this.arm = new Entity((int) (game.screenWidth/2f), (int) (game.screenHeight /2.5f) - 100);
-        this.bicep = new Animation(1f,arm.getFrames(tex,0,3,0,64,128,false));
+        this.bicep = new Animation(1f,arm.getFrames(new Texture("gymmini/ArmSheet.png"),0,3,0,64,128,false));
         this.arm.currentAnimation = this.bicep;
         this.scale = 4f;
 
