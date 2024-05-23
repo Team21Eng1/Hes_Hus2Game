@@ -457,7 +457,7 @@ public class MainGameScreen implements Screen, InputProcessor {
      * @return The final score as an integer.
      */
     public int getFinalScore() {
-        return EventManager.getScore(activities);
+        return game.eventM.getScore();
     }
 
     /**
@@ -465,7 +465,7 @@ public class MainGameScreen implements Screen, InputProcessor {
      * @return A list of strings describing the achievements unlocked.
      */
     public List<String> getFinalAchievements() {
-        return EventManager.getAchievements(activities);
+        return game.eventM.getAchievements(activities);
     }
 
     // Example method that might be called when the game transitions to an end screen or similar:

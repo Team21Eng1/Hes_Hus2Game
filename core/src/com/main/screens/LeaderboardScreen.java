@@ -33,7 +33,6 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     List<String[]> highScores;  // List to hold score entries as arrays
     private String UserName;
     private boolean inputName = false;
-    private final Texture backButton;
     private float backButtonX, backButtonY, backButtonWidth, backButtonHeight;
 
     private float titleY;
