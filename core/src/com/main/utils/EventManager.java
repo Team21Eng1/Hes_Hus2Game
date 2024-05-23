@@ -33,7 +33,8 @@ public class EventManager {
         curDay++;
     }
 
-    public void updateHours(int add){
+    public void updateHours(int add)
+    {
         int hour = Integer.valueOf(hours);
         hours = String.format("%02d",(hour + add));
     }

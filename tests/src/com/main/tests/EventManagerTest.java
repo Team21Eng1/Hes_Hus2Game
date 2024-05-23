@@ -33,8 +33,3 @@ public class EventManagerTest extends LibgdxUnitTest{
 }
 
 
-    }
-}
-
-
-
