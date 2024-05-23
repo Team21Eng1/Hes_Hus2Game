@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.main.Main;
 import com.main.entity.Player;
@@ -15,10 +14,8 @@ import com.main.entity.Player;
 import com.main.entity.Student;
 import com.main.map.*;
 
-import com.main.utils.ActivityType;
 import com.main.utils.CollisionHandler;
 import com.main.utils.ScreenType;
-import com.main.utils.EventManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +36,14 @@ public class MainGameScreen implements Screen, InputProcessor {
     private final OrthographicCamera camera, roomCam, guiCam;
     private final ShapeRenderer shapeRenderer;
     private final Main game;
-    private final float gameDayLengthInSeconds;
-    private final float secondsPerGameHour;
     private float FadePerc;
 
 
     // Non-final attributes
     private String activity;
-    private int duration, dayNum,currentHour;
-    private float timeElapsed, fadeTime, minShade;
-    private boolean fadeOut, lockTime, lockMovement;
+    private int duration;
+
+    private boolean fadeOut, lockMovement;
     private GUI gui;
 
 
@@ -72,17 +67,10 @@ public class MainGameScreen implements Screen, InputProcessor {
     public MainGameScreen(Main game) {
         this.game = game;
         this.shader = new Color(0.5f, 0.5f, 0.5f, 1);
-        this.gameDayLengthInSeconds = 60f;
-        this.secondsPerGameHour = this.gameDayLengthInSeconds / 16; // Assuming 16 hours in a day
-
         // Initialize non-final attributes
         this.duration = 1;
-        this.dayNum = 1;
-        this.timeElapsed = 0f;
-        this.currentHour = 10;
-        this.fadeTime = 0;
-        this.minShade = 0;
-        this.fadeOut = this.lockTime = this.lockMovement = false;
+
+        this.fadeOut = this.lockMovement = false;
 
         // Setting up the game
         this.camera = new OrthographicCamera();
@@ -137,7 +125,7 @@ public class MainGameScreen implements Screen, InputProcessor {
         if(locPlay==null){locPlay=player;}
         if (locPlay.isMoving && !lockMovement)
         {
-            energy -= locPlay.normalizedSpeed * delta*0.02f;
+            energy -= locPlay.normalizedSpeed * delta*0.01f;
         }
         if (energy<=0)
         {
@@ -152,10 +140,8 @@ public class MainGameScreen implements Screen, InputProcessor {
     @Override
     public void render(float delta) {
         if (!lockMovement) player.update(delta);
-        if (!lockTime){
-            updateGameTime(delta);
-            updateEnergy(delta);
-        } // Update the game clock
+        game.eventM.updateTime(delta);
+        updateEnergy(delta);
 
         ScreenUtils.clear(0, 0, 1, 1);
         gameMap.update(delta);
@@ -192,17 +178,15 @@ public class MainGameScreen implements Screen, InputProcessor {
 
         }
 
-
-        gui.counterText.text = String.format("Recreation Activities done: \nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
+        gui.update(delta);
+        //gui.counterText.text = String.format("Recreation Activities done: \nStudy hours: " + player.worldX + "\nMeals Eaten: " + player.worldY, dayNum, timeElapsed );
         gui.render(game.batch);
-        drawGameTime();
     }
 
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this);
-        lockTime = false;
     }
 
     /**
@@ -231,6 +215,20 @@ public class MainGameScreen implements Screen, InputProcessor {
 
             roomMap.renderEntities(batch);
         }
+
+    }
+    public void freeze()
+    {
+        if (roomMap!=null && roomMap.showing==true){ roomMap.freeze = true;} else {lockMovement = true;}
+
+        game.eventM.freezeTime = true;
+
+    }
+    public void unfreeze()
+    {
+        if (roomMap!=null && roomMap.showing==true){ roomMap.freeze = false;} else {lockMovement = false;}
+
+        game.eventM.freezeTime = false;
 
     }
 
@@ -272,34 +270,63 @@ public class MainGameScreen implements Screen, InputProcessor {
                 switch(roomMap.activity)
                 {
                     case EXIT:
-                        game.screenManager.setScreen(ScreenType.LEADERBOARD);
-                        //game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+                        game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+
                         roomMap.showing = false;
+                        unfreeze();
                         lockMovement = false;
                         break;
                     case SLEEP:
-                        if (time)
-                        game.eventM.curDay++;
-                        resetDay();
+                        if (Integer.valueOf(game.eventM.hours) > 19)
+                        {
+                            game.eventM.curDay++;
+                            resetDay();
+                        }
+                        else {
+                            //popup or summate
+                            gui.popup = gui.sleep;
+                            gui.popup.showing = true;
+                            freeze();
+
+                        }
 
                         break;
                     case EAT:
                         energy+=30;
+                        game.eventM.updateHours(1);
                         if (energy > energyMax) energy = energyMax;
                         game.screenManager.setScreen(ScreenType.SNAKE_MINI_GAME);
                         roomMap.showing = false;
                         lockMovement = false;
                         break;
                     case STUDY:
-                        gui.popupMenu.setPopText("Study");
-                        gui.popupMenu.showing = true;
+                        gui.durationPopupMenu.setPopText("Study");
+                        gui.durationPopupMenu.showing = true;
                         roomMap.lockMovement = true;
                         break;
                     case EXCERCISE:
-                        game.screenManager.setScreen(ScreenType.GYM,1);
+                        if (energy < 20)
+                        {
+                            gui.popup = gui.energyP;
+                            gui.popup.showing = true;
+                            freeze();
+                        } else {
+                            energy-=20;
+                            game.eventM.updateHours(1);
+                            game.screenManager.setScreen(ScreenType.GYM, 1);
+                        }
                         break;
                     case NONE:
-                        game.screenManager.setScreen(ScreenType.PONG_MINI_GAME,1);
+                        if (energy < 20){
+                            gui.popup = gui.energyP;
+                            gui.popup.showing = true;
+                            freeze();
+                        } else {
+                            energy-=20;
+                            game.eventM.updateHours(2);
+                            game.screenManager.setScreen(ScreenType.PONG_MINI_GAME,1);
+                        }
+
                         break;
 
                 }
@@ -308,8 +335,6 @@ public class MainGameScreen implements Screen, InputProcessor {
 
             }
         }
-
-
     }
 
 
@@ -342,36 +367,11 @@ public class MainGameScreen implements Screen, InputProcessor {
         if (collisionHandler.isTouching("Goodricke_door", player.getHitBox())) return "Goodricke_door";
         return "";
     }
-
-    /**
-     * Updates the game time and handles the transition from day to night.
-     * @param delta The time elapsed since the last frame.
-     */
-    private void updateGameTime(float delta) {
-        timeElapsed += delta;
-
-        // Calculate the current hour in game time
-        int hoursPassed = (int)(timeElapsed / secondsPerGameHour);
-        currentHour = 8 + hoursPassed; // Starts at 08:00 AM
-
-        // Ensure the hour cycles through the active hours correctly (8 AM to 12 AM)
-        if (currentHour >= 24) { // If it reaches 12 AM, reset to 8 AM the next day
-
-            resetDay();
-        }
-
-
-
-    }
-
     private void resetDay(){
         fadeOut = true;
-        lockMovement = true;
-        if (roomMap instanceof Accom) ((Accom) roomMap).freeze = true;
-        currentHour = 8;
-        dayNum++;
-        timeElapsed = 0;
-        if (dayNum == 8)
+        freeze();
+        game.eventM.nextDay();
+        if (game.eventM.curDay == 8)
         {
             score = game.eventM.getScore();
             Gdx.app.log("score: ", String.valueOf(score));
@@ -381,26 +381,13 @@ public class MainGameScreen implements Screen, InputProcessor {
         }
 
     }
-
     private void FinishReset()
     {
-        if (roomMap instanceof Accom) {((Accom) roomMap).freeze = false;energy = energyMax;}
-        else lockMovement = false;
+        if (roomMap instanceof Accom) {
+            energy = energyMax;
+        }
+        unfreeze();
     }
-
-
-    /**
-     * Draws the game time display.
-     */
-    private void drawGameTime() {
-        // Adjust the format if you want to display minutes or seconds
-        String timeString = String.format("Day: %d       Time: %02d:00", dayNum, currentHour%24);
-        game.batch.begin();
-        font.draw(game.batch, timeString, game.screenWidth - 320 * game.scaleFactorX, game.screenHeight - 15 * game.scaleFactorY);
-        game.batch.end();
-    }
-
-
 
     /**
      * Handles touch input from the user, managing interactions with UI elements and game objects.
@@ -413,38 +400,51 @@ public class MainGameScreen implements Screen, InputProcessor {
      */
     @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button){
+        //gui.popup.showing=true;
+
         Vector2 mouse = new Vector2(touchX,game.screenHeight - touchY);
         if (gui.menuButton.overlap(mouse,zoom)) {
             game.audio.buttonClickedSoundActivate();
             game.screenManager.setScreen(ScreenType.MAIN_MENU);
         }
-        if (gui.popupMenu.showing)
+        if (gui.durationPopupMenu.showing)
         {
-            if(gui.popupMenu.durUpB.overlap(mouse,zoom)){
+            if(gui.durationPopupMenu.durUpB.overlap(mouse,zoom)){
                 game.audio.buttonClickedSoundActivate();
-                gui.popupMenu.changeDur(1);
+                gui.durationPopupMenu.changeDur(1);
                 //duration up
                 return true;
-            } else if (gui.popupMenu.durDownB.overlap(mouse,zoom))
+            } else if (gui.durationPopupMenu.durDownB.overlap(mouse,zoom))
             {
                 game.audio.buttonClickedSoundActivate();
-                gui.popupMenu.changeDur(-1);
+                gui.durationPopupMenu.changeDur(-1);
                 //duration down
                 return true;
-            } else if (gui.popupMenu.BackB.overlap(mouse,zoom))
+            } else if (gui.durationPopupMenu.BackB.overlap(mouse,zoom))
             {
                 game.audio.buttonClickedSoundActivate();
                 //close menu
                 roomMap.lockMovement=false;
-                gui.popupMenu.showing = false;
+                gui.durationPopupMenu.showing = false;
                 return true;
-            }else if (gui.popupMenu.GoB.overlap(mouse,zoom))
+            }else if (gui.durationPopupMenu.GoB.overlap(mouse,zoom))
             {
                 game.audio.buttonClickedSoundActivate();
                 //start activity
-                game.screenManager.setScreen(ScreenType.TYPING_MINI_GAME,gui.popupMenu.getDuration());
-                gui.popupMenu.showing = false;
-                roomMap.lockMovement=false;
+                if (energy < 10*gui.durationPopupMenu.getDuration())
+                {
+                    gui.popup = gui.energyP;
+                    gui.popup.showing = true;
+                    freeze();
+                    gui.durationPopupMenu.showing = false;
+
+                } else {
+                    energy-=10*gui.durationPopupMenu.getDuration();
+                    game.eventM.updateHours(gui.durationPopupMenu.getDuration());
+                    game.screenManager.setScreen(ScreenType.TYPING_MINI_GAME, gui.durationPopupMenu.getDuration());
+                    gui.durationPopupMenu.showing = false;
+                    roomMap.lockMovement = false;
+                }
                 return true;
             }
         }
@@ -486,7 +486,12 @@ public class MainGameScreen implements Screen, InputProcessor {
     @Override
     public boolean keyDown(int i) {
         if (i == Input.Keys.SPACE) {
-            space = true;
+
+            if (gui.popup.showing)
+            {
+                gui.popup.showing = false;
+                unfreeze();
+            } else {space = true;}
         }
 
 
@@ -497,6 +502,7 @@ public class MainGameScreen implements Screen, InputProcessor {
     public boolean keyUp(int i) {
         if (i == Input.Keys.SPACE) {
             space = false;
+
         }
 
         return false;

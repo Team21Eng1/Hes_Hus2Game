@@ -47,9 +47,9 @@ public class Piazza extends GameMap{
         player = new Player(game, this, camera,80,20);
         player.camFollow = false;
         student1 = new Student((GameMap) this, 80,200);
-        student1.setTextBox("eat?", 20,50, font);
+        student1.setTextBox("eat?", 20,100, font);
         student2 = new Student((GameMap) this, 200,100);
-        student2.setTextBox("study?", 20,50, font);
+        student2.setTextBox("study?", 20,100, font);
         entities.add(student1);
         entities.add(student2);
 
@@ -111,7 +111,7 @@ public class Piazza extends GameMap{
         for (Entity e :entities) {
             if (e instanceof Player)
             {
-                if (!lockMovement){e.update(delta);}
+                if (!freeze){e.update(delta);}
             } else {
                 e.update(delta);
             }

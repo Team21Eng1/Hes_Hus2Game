@@ -24,7 +24,7 @@ public class Accom extends GameMap{
      */
     Student student;
     Main game;
-    public boolean freeze;
+
     public Accom(Main game, OrthographicCamera camera) {
         super(game,camera, "map/interior_maps/goodrickeaccom .tmx");
         this.game = game;

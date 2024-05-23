@@ -33,7 +33,7 @@ public class Slider {
         sr.setProjectionMatrix(proj);
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(color); // Adjust alpha for darkness
-        sr.rect(x, y, barWidth*scale, height*scale);
+        sr.rect(x, y, barWidth, height);
 
         sr.end();
     }

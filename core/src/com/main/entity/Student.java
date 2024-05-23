@@ -38,6 +38,7 @@ public class Student extends Entity {
     public boolean canInteract,idle;
     String disText;
     public TextBox textBox;
+    private int textWid;
 
 
     Animation<TextureRegion> walkDownAnimation, walkRightAnimation, walkLeftAnimation, walkUpAnimation;
@@ -58,7 +59,7 @@ public class Student extends Entity {
         this.speed = 200;
         this.worldX = startX;
         this.worldY = startY;
-        Gdx.app.log("hi",String.valueOf(worldX));
+
 
 
         sprSheet = new Texture("character/NPCS.png");
@@ -92,7 +93,9 @@ public class Student extends Entity {
     public void setTextBox(String text, int height, int width, BitmapFont font)
     {
         canInteract = true;
-        textBox = new TextBox(text,(int)worldX,(int)worldY+ 20,height,width,font);
+        textBox = new TextBox(text,(int) worldX,(int)worldY+ 20,width,height,font);
+        textWid =width;
+
     }
 
 
@@ -117,7 +120,7 @@ public class Student extends Entity {
         stateTime += delta;
 
         if(!idle){updatePath(delta);}
-        if (canInteract) {textBox.setPosition((int)worldX,(int)worldY+spriteY+ 30);}
+        if (canInteract) {textBox.setPosition((int)(worldX - textWid/2 + this.getWidth()),(int)worldY+spriteY+ 30);}
 
     }
     private void updatePath(float delta)

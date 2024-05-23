@@ -104,7 +104,7 @@ public class GymMini implements Screen, InputProcessor {
     }
     public float getScoreConst(float perc)
     {
-        Gdx.app.log("perc",String.valueOf(perc));
+
         if (perc < 0.50) { return 1;}
         else if (perc > .49 && perc < .80) {return 2;}
         else { return 3;}

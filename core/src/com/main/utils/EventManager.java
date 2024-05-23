@@ -1,13 +1,18 @@
 package com.main.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EventManager {
+    private final float SecPerHour;
     ArrayList<ActivityType> activities;
     ArrayList<Integer> scores;
     ArrayList<Float> times;
     ArrayList<Integer> days;
+    public String hours,mins;
+    private float rawTime,SecPerMin;
+    public boolean freezeTime;
     public int curDay;
     public EventManager()
     {
@@ -16,16 +21,51 @@ public class EventManager {
         this.times = new ArrayList<Float>();
         this.days = new ArrayList<Integer>();
         this.curDay = 1;
-    }
+        this.hours = "08";
+        this.mins = "00";
+        this.SecPerHour = 10;
+        this.SecPerMin = SecPerHour/60;
+        this.freezeTime = false;
+;    }
     public void nextDay()
     {
+        hours = "08";
+        mins = "00";
         curDay++;
     }
 
+    public void updateHours(int add){
+        int hour = Integer.valueOf(hours);
+        hours = String.format("%02d",(hour + add));
+    }
 
+    public void updateTime(float delta)
+    {
+        if (!freezeTime) {rawTime+=delta;}
+        if (rawTime > SecPerMin)
+        {
+            rawTime=0;
+            int min = Integer.valueOf(mins);
+            min++;
+            if (min >= 60) {
+                min = 0;
+                int hour = Integer.valueOf(hours);
+                hour++;
+                if (hour >= 24) {
+                    hour = 0;
+                    curDay++;
+
+                }
+                hours = String.format("%02d",hour);
+            }
+            mins = String.format("%02d",min);
+        }
+
+    }
 
     public int getScore() {
         int score = 0;
+        boolean slept;
         int cumulativeEat = 1;
         int cumulativeSleep = 1;
         int studyCount = 0;
@@ -34,86 +74,114 @@ public class EventManager {
         int recTotal = 0;
         double studyDebuff = 1;
         double recDebuff = 1;
-        List<List<String>> days = new ArrayList<>();
-        List<String> day = new ArrayList<>();
-        for (ActivityType event : activities) {
-            switch (event) {
+        //List<List<String>> days = new ArrayList<>();
+        //List<String> day = new ArrayList<>();
+        int dayNo = 1;
+        for (int i = 0; i < activities.size();i++)
+        {
+
+            if (days.get(i) != dayNo) { //missed a sleep
+                score -= 300;
+                dayNo++;
+            }
+            switch (activities.get(i)) {
                 case EAT:
-                    score += cumulativeEat;
+                    score += cumulativeEat*3;
                     cumulativeEat += cumulativeEat;
+                    if (cumulativeEat > 7) {score -= 40;} //overate that day
                     break;
                 case SLEEP:
-                    score += cumulativeSleep;
+                    score += 100 + cumulativeSleep*5;
                     cumulativeSleep += cumulativeSleep;
-                    days.add(day);
-                    day.clear();
+                    dayNo++;
+
                     break;
                 case EXCERCISE:
-                    score += 10;
-                    recCount += 1;
-                    score -= 5;
+
+                    //use score from minigame;
                     break;
                 case STUDY:
                     studyTotal += 10;
                     studyCount += 1;
                     score += 10;
                     break;
+                case NONE:
+                    studyTotal += 20;
+                    studyCount += 1;
+                    score += 10;
+                    break;
                 default:
                     score += 1;
                     break;
-
             }
-            studyDebuff = 0.15 * (-(studyCount * studyCount) + (28 * studyCount));
-            recDebuff = (double) 140 / (((recCount - 10) * (recCount - 10)) + 5);
         }
-
-
-
+        studyDebuff = 0.15 * studyCount* (18-studyCount);
+        recDebuff = (double) 140 / (((recCount - 10) * (recCount - 10)) + 5);
 
         score += (int) Math.round(studyDebuff * studyTotal);
         score += (int) Math.round(recDebuff * recTotal);
         //if you studied 7 days in a row 10 points are added, if you also did recreational activities 15 points are added
-        if(getStreak(days, "study").get(0) == 7 && getStreak(days, "exercise").get(0) == 7){
-            score += 15;
-            if (score > 692){
-                score = 100;
-            }
+        if(getStreak(ActivityType.STUDY) == 7 && getStreak(ActivityType.EXCERCISE) == 7){
+            score += 300;
         }
-        else if(getStreak(days, "study").get(0) == 7){
-            score += 10;
-            if (score > 692){
-                score = 100;
-            }
+        else if(getStreak(ActivityType.STUDY) == 7){
+            score += 200;
+
+        }
+
+        for (AchievementType at : checkForAchievements())
+        {
+            score += 500;
         }
 
         return (int)((score));
     }
 
-    public static List<Integer> getStreak(List<List<String>> locDays, String event)
+    public ArrayList<AchievementType> checkForAchievements()
     {
-        List<Integer> returns = new ArrayList<>();
-        if(locDays.size() > 3)
+        ArrayList<AchievementType> achievements = new ArrayList<AchievementType>();
+        if (getNum(ActivityType.EAT) > 7 && curDay < 3){achievements.add(AchievementType.GLUTTON);}; //Glutton - eating gives you more energy
+        if (getNum(ActivityType.STUDY) > 4 && curDay <3){achievements.add(AchievementType.NERD);}; //Nerd - your parents see you work and buy you a present
+        if (getStreak(ActivityType.SLEEP) < 4 && curDay < 6){achievements.add(AchievementType.ROUGH_SLEEPER);};//ROUGH SLEEPER - more friends from walking around
+        if (getStreak(ActivityType.EXCERCISE) == 4){achievements.add(AchievementType.BRAWN);};//brains AND brawns - max energy increase
+        if (getStreak(ActivityType.NONE) == 7){achievements.add(AchievementType.TEACHPET);};//Studious Learner - your lecturer gives you some tips for your final exam
+        return achievements;
+    }
+    public int getNum(ActivityType act) {
+        int count = 0;
+        for (ActivityType a : activities)
         {
-            int bestStreak = 0;
-            int currentStreak = 0;
-            for (int i = 1; i < locDays.size(); i++) {
-                if (locDays.get(i).contains(event) && locDays.get(i - 1).contains(event)){
-                    currentStreak += 1;
-                }
-                else{
-                    if(currentStreak > bestStreak){
-                        bestStreak = currentStreak;
-                    }
+            if (a.equals(act)) count++;
+        }
+        return count;
+
+    }
+    public int getStreak(ActivityType act)
+    {
+        ArrayList<Integer> noDays = new ArrayList<Integer>();
+        for (int i=0;i<activities.size();i++)
+        {
+            if (activities.get(i)==act)
+            {
+                if (!noDays.contains(Integer.valueOf(days.get(i)))){
+                    noDays.add(Integer.valueOf(days.get(i)));
                 }
             }
-            returns.add(bestStreak);
-            returns.add(currentStreak);
         }
-        else{
-            returns.add(0);
-            returns.add(0);
+
+        int lastday = 0;
+        int streak = 0;
+        int maxStreak = 0;
+        for (int i = 1;i<8;i++)
+        {
+            if (lastday == i-1)
+            {
+                streak +=1;
+                lastday = i;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {streak = 0;}
         }
-        return returns;
+        return maxStreak;
     }
 
     public void logEvent(ActivityType activity, int score)

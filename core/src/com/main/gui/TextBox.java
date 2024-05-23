@@ -3,6 +3,7 @@ package com.main.gui;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Align;
 
 public class TextBox {
     public String text;
@@ -11,8 +12,8 @@ public class TextBox {
     private int xPos;
     private int yPos;
     BitmapFont font;
-
-    public TextBox(String text,int xPos,int yPos, int height, int width, BitmapFont font)
+    public int align;
+    public TextBox(String text,int xPos,int yPos, int width, int height, BitmapFont font)
     {
         this.text = text;
         this.height = height;
@@ -20,7 +21,8 @@ public class TextBox {
         this.font = font;
         this.xPos = xPos;
         this.yPos = yPos;
-        this.width = text.length()*5;
+        this.width = width;
+        this.align = Align.center;
         font.getData().setScale(1);
     }
     public void scaleFont(float scale)
@@ -32,13 +34,12 @@ public class TextBox {
     {
         xPos=x;
         yPos=y;
-        Centre();
     }
 
 
     public void render(SpriteBatch batch)
     {
-        font.draw(batch, text, xPos, yPos);
+        font.draw(batch, text, xPos, yPos,width, align,true);
     }
 
     public void Centre()
@@ -46,4 +47,6 @@ public class TextBox {
         xPos = (int) (xPos - width/2);
         //yPos = (int) (yPos - height/2);
     }
+    public int getX(){return xPos;}
+    public int getY(){return yPos;}
 }

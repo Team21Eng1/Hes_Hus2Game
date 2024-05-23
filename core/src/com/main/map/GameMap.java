@@ -36,6 +36,7 @@ public class GameMap extends TiledMap {
     public Boolean showing;
     public ActivityType activity;
     public boolean lockMovement = false;
+    public boolean freeze;
 
     ArrayList<Entity> entities;
     BitmapFont font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));

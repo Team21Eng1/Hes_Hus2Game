@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.files.FileHandle;
 import com.main.Main;
 import com.main.gui.Button;
+import com.main.gui.TextBox;
+import com.main.utils.AchievementType;
 import com.main.utils.ScreenType;
 
 import java.io.ByteArrayInputStream;
@@ -33,9 +35,12 @@ public class LeaderboardScreen implements Screen, InputProcessor {
     private boolean inputName = false;
     private float titleY;
     private OrthographicCamera cam;
-    private Button backButton,backButton2;
+    private Button backButton,backButton2,Achieve;
     float timer,t;
     char inputCap;
+    private ArrayList<AchievementType> achmnts;
+
+    private TextBox AchievmentText;
 
     public LeaderboardScreen(Main game) {
         this.game = game;
@@ -56,9 +61,24 @@ public class LeaderboardScreen implements Screen, InputProcessor {
             backButton2 = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2 + 200,game.screenHeight/8,5);
             backButton2.Centre();
             timer = 0.6f;
+
         } else {
             backButton = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2,game.screenHeight/8,5);
             backButton.Centre();
+        }
+        Achieve = new Button(new Texture("counter_big.png"),0,0,4);
+
+        achmnts = game.eventM.checkForAchievements();
+
+        achmnts.add(AchievementType.BRAWN);
+        achmnts.add(AchievementType.NERD);
+        achmnts.add(AchievementType.TEACHPET);
+        achmnts.add(AchievementType.GLUTTON);
+        achmnts.add(AchievementType.ROUGH_SLEEPER);
+
+        if (achmnts.size() == 0) {AchievmentText = new TextBox("ACHIEVEMENTS:\nYour achievments will appear here at the end of the game!",Achieve.x+4,Achieve.y+Achieve.height,Achieve.width,20,font);}
+        else {AchievmentText = new TextBox("ACHIEVEMENTS:",Achieve.x+4,Achieve.y+Achieve.height,Achieve.width,20,font);
+
         }
 
 
@@ -116,6 +136,9 @@ public class LeaderboardScreen implements Screen, InputProcessor {
             font.draw(game.batch, displayText, game.screenWidth/3, y, game.screenWidth, Align.topLeft, false);
             y -= font.getLineHeight(); // Move to the next line
         }
+
+
+
         if (game.eventM.curDay==8) {
             renderUserIn(y,12345);
             backButton2.render(game.batch);
@@ -123,9 +146,50 @@ public class LeaderboardScreen implements Screen, InputProcessor {
             if (t>timer) {t=0; if (inputCap == '<') {  inputCap = ' ';} else {inputCap = '<';}}
         }
         backButton.render(game.batch);
+        Achieve.render(game.batch);
+        AchievmentText.render(game.batch);
 
+        int count = 1;
+        int yAch = (int) (AchievmentText.getY()-font.getLineHeight());
+        for (AchievementType at : achmnts)
+        {
+
+            drawAchievementText(at,yAch);
+            yAch -= font.getLineHeight()*3;
+
+        }
         game.batch.end();
         font.getData().setScale(1);
+
+
+    }
+
+    public void drawAchievementText(AchievementType at,int y)
+    {
+        switch (at) {
+            case NERD:
+                font.draw(game.batch ,"NERD",Achieve.x,y,Achieve.width,Align.center,true);
+                font.draw(game.batch ,"You study... too much",Achieve.x,y-font.getLineHeight(),Achieve.width,Align.center,true);
+                break;
+            case BRAWN:
+                font.draw(game.batch ,"BRAINS AND BRAWNS",Achieve.x,y,Achieve.width,Align.center,true);
+                font.draw(game.batch ,"You buff scientist you.",Achieve.x,y-font.getLineHeight(),Achieve.width,Align.center,true);
+                break;
+            case GLUTTON:
+                font.draw(game.batch ,"GLUTTON GOURMET",Achieve.x,y,Achieve.width,Align.center,true);
+                font.draw(game.batch ,"You have an exam soon you know?",Achieve.x,y-font.getLineHeight(),Achieve.width,Align.center,true);
+                break;
+            case ROUGH_SLEEPER:
+                font.draw(game.batch ,"ROUGH SLEEPER",Achieve.x,y,Achieve.width,Align.center,true);
+                font.draw(game.batch ,"The floor is pretty comfy to be fair.",Achieve.x,y-font.getLineHeight(),Achieve.width,Align.center,true);
+                break;
+            case TEACHPET:
+                font.draw(game.batch ,"TEACHERS PET",Achieve.x,y,Achieve.width,Align.center,true);
+                font.draw(game.batch ,"Friends with the lecturers are we?",Achieve.x,y-font.getLineHeight(),Achieve.width,Align.center,true);
+                break;
+
+
+        }
     }
     public void renderUserIn(float lnHeight,int score)
     {

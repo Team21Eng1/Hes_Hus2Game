@@ -6,13 +6,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Popup {
 
-    private int x, y;
-    private final float scale;
+    public int x, y;
+    public final float scale;
     public Button durMenuBg, durUpB, durDownB, BackB,GoB;
-    public TextBox ActTextBox, DurTextBox;
-    private BitmapFont font;
+    public TextBox Title, CloseDesc;
+    public BitmapFont font;
     public Boolean showing;
     private int duration;
+    float t,timer;
+    boolean flash = false;
 
     public Popup(int x, int y, float scale, BitmapFont font)
     {
@@ -21,72 +23,38 @@ public class Popup {
         this.y = y;
         this.scale = scale;
         this.font = font;
-        this.showing = false;
-
+        this.showing = true;
+        this.timer = 0.6f;
+        this.t = 0;
         SetUp();
     }
-
-    public void SetUp()
-    {
-        durMenuBg = new Button(new Texture("duration_menu_background.png"),x,y,scale);
+    public void SetUp() {
+        durMenuBg = new Button(new Texture("duration_menu_background.png"), x, y, scale);
         durMenuBg.Centre();
-        GoB = new Button(new Texture("go_button.png"),(int) (durMenuBg.x + durMenuBg.width*scale/2),durMenuBg.y,scale);
-        GoB.pad(0,0,0,30);
-        GoB.Centre();
-        BackB = new Button(new Texture("settings_gui/back_button.png"),x,y-115,scale);
-        BackB.Centre();
-        durUpB = new Button(new Texture("settings_gui/arrow_right_button.png"), (int) (durMenuBg.x + durMenuBg.width*scale),GoB.y,scale);
-        durUpB.pad(10,10,10,10);
-        durUpB.Right();
-        durDownB = new Button(new Texture("settings_gui/arrow_left_button.png"),durMenuBg.x,GoB.y,scale);
-        durDownB.pad(10,10,10,10);
         font.getData().setScale(2);
-        ActTextBox = new TextBox("Activity \nDuration?",durMenuBg.x + 25, (int) (durMenuBg.y+ durMenuBg.height*scale) + 10,200,200,font);
-
-        DurTextBox = new TextBox(String.valueOf(duration),durMenuBg.x + 60, durMenuBg.y + 150,200,200,font);
-
-
-
+        Title = new TextBox("TestPopup", durMenuBg.x, (int) (durMenuBg.y + durMenuBg.height) - 20, durMenuBg.width, 200, font);
+        CloseDesc = new TextBox("Press space to close", durMenuBg.x, durMenuBg.y + 150, durMenuBg.width, 200, font);
 
 
     }
-    public void setPopText(String activity)
-    {
-        ActTextBox.text = activity+" \nDuration?";
-    }
-    public void changeDur(int i)
-    {
-        if (duration+i!=0 && duration+i!=5)
-        {
-            duration+=i;
-            DurTextBox.text=String.valueOf(duration);
-        }
-    }
-    public int getDuration()
-    {
-        return duration;
-    }
-
-
-
-    public void render(SpriteBatch batch)
-    {
-        if (showing){
+    public void render(SpriteBatch batch) {
+        if (showing) {
             durMenuBg.render(batch);
-            BackB.render(batch);
-            durUpB.render(batch);
-            durDownB.render(batch);
             font.getData().setScale(1.5f);
-            ActTextBox.render(batch);
-            font.getData().setScale(3);
-            DurTextBox.render(batch);
+            Title.render(batch);
+            font.getData().setScale(0.7f);
+            if (flash) CloseDesc.render(batch);
+
             font.getData().setScale(1);
-            GoB.render(batch);
         }
-
-
-
     }
-
+    public void update(float delta)
+    {
+        t+=delta;
+        if (t>timer) {
+            flash = !flash;
+            t=0;
+        }
+    }
 
 }
