@@ -1,7 +1,9 @@
 package com.main.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,6 +21,7 @@ public class CollisionHandler {
     private final float objWidth, objHeight;
     private final float offSetX, offSetY;
     private ArrayList<TiledMapTileLayer> collisionLayers;
+    private ArrayList<TiledMapTileMapObject> collisionObjects;
 
     /**
      * Constructs a CollisionHandler with specified parameters.
@@ -40,6 +43,7 @@ public class CollisionHandler {
         this.offSetX = (objWidth - this.objWidth) / 2;
         this.offSetY = (objHeight - this.objHeight) / 2;
         this.collisionLayers = new ArrayList<>();
+        this.collisionObjects = new ArrayList<>();
     }
 
     /**
@@ -52,6 +56,7 @@ public class CollisionHandler {
             collisionLayers.add((TiledMapTileLayer) tiledMap.getLayers().get(layer));
         }
     }
+
     public void clearCollisionLayers(){
         this.collisionLayers = new ArrayList<>();
     }

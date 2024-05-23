@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,8 +20,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.main.Main;
-import com.main.screens.MainGameScreen;
-import com.main.utils.ScreenManager;
+import com.main.entity.Entity;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -37,7 +38,7 @@ public class Pong implements Screen {
     private Vector2 ballVelocity;
     private int scoreLeft = 0;
     private int scoreRight =0;
-    private static final float PADDLE_SPEED = 500;
+    private static float PADDLE_SPEED;
     private static final float BALL_SPEED = 200;
     private float timeElapsed =0;
     private float increasedInterval = 10;
@@ -48,13 +49,20 @@ public class Pong implements Screen {
     private boolean gameOver;
     private float gameOverTimer;
     private static final float GAME_OVER_PAUSE = 2;
-    private Texture backgroundImage;
+    private Texture backgroundImage,foreGroundImage;
     private Stage stage;
     private BitmapFont customFont, titleFont;
     private Window popupWindow;
+
     private static final float GAME_DURATION = 20.0f; // 20 seconds
     private float timeRemaining;
     private boolean gameStarted = false;
+
+    private Entity foreground;
+    private Rectangle screen;
+    private int angle;
+
+
 
 
     public Pong (Main game) {
@@ -64,18 +72,51 @@ public class Pong implements Screen {
     public void show() {
         customFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
         batch = new SpriteBatch();
-
+        screen = new Rectangle(520,230,920,440);
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
-        paddle= new Rectangle(Gdx.graphics.getWidth()/ 2 - 50, 20, 140, 10);
+        paddle= new Rectangle(Gdx.graphics.getWidth()/ 2 - 50, screen.y+10, 140, 10);
         ball = new Circle(Gdx.graphics.getWidth()/ 2, Gdx.graphics.getHeight() /2,10);
-        ballVelocity = new Vector2(BALL_SPEED, -BALL_SPEED);
+
+        PADDLE_SPEED = 500;
+        if (Math.random() > 0.5f)
+        {
+            angle = (int) (120 + 35* Math.random());
+        } else{
+            angle = (int) (240 + -35* Math.random());
+        }
+
+
+        ballVelocity = new Vector2((float) (200*Math.sin(Math.toRadians(angle))), (float) (200*Math.cos(Math.toRadians(angle))));
+
         backgroundImage = new Texture("bg_space_seamless.png");
+        foreGroundImage = new Texture("gymmini/LectureLap.png");
+        foreground = new Entity(0,0);
+        foreground.currentAnimation= new Animation<>(0.4f,foreground.getFrames(foreGroundImage,0,3,0,1600,900,false));
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
+
         setupPopup();
         timeRemaining = GAME_DURATION;
+
+        //setupPopup();
+
+
+        Texture exitTexture = new Texture("menu_gui/exit_button.png");
+        ImageButton exitButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(exitTexture)));
+        exitButton.getImage().setScale(3f);
+        exitButton.setPosition(Gdx.graphics.getWidth() - exitButton.getWidth() - 65,30);
+
+
+        exitButton.addListener(new ClickListener(){
+            public void clicked (InputEvent event, float x, float y){
+                game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+            }
+        });
+        stage.addActor(exitButton);
+
+
     }
 
     private void setupPopup() {
@@ -111,6 +152,10 @@ public class Pong implements Screen {
     }
 
     public void render(float delta) {
+
+        foreground.stateTime+=delta;
+
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -123,8 +168,20 @@ public class Pong implements Screen {
         shapeRenderer.end();
 
         batch.begin();
+
         customFont.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
         customFont.draw(batch, "Time: " + (int) timeRemaining, Gdx.graphics.getWidth() / 2 - 20, Gdx.graphics.getHeight() - 10);
+
+        batch.draw(foreground.getCurrentFrame(),0,0,game.screenWidth,game.screenHeight);
+        batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.WHITE);
+        //shapeRenderer.rect(screen.x, screen.y, screen.width, screen.height);
+        shapeRenderer.end();
+        batch.begin();
+        customFont.draw(batch ,"Score " + score, 10, Gdx.graphics.getHeight() - 10);
+
         customFont.draw(batch, "Use LEFT and RIGHT arrow keys to move the paddle",
                 Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
         batch.end();
@@ -137,6 +194,7 @@ public class Pong implements Screen {
         stage.draw();
     }
     private void update(float delta) {
+
         if (gameOver) {
             if (gameOverTimer > 0) {
                 gameOverTimer -= delta;
@@ -158,49 +216,69 @@ public class Pong implements Screen {
             increaseBallSpeed();
             timeElapsed = 0;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+
             paddle.x -= PADDLE_SPEED * delta;
-            if (paddle.x < 0) {
-                paddle.x = 0;
+            if (paddle.x < screen.x) {
+                paddle.x = screen.x;
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             paddle.x += PADDLE_SPEED * delta;
-            if (paddle.x + paddle.width > Gdx.graphics.getWidth()) {
-                paddle.x = Gdx.graphics.getWidth() - paddle.width;
+            if (paddle.x + paddle.width > screen.x+screen.width) {
+                paddle.x = screen.x+screen.width - paddle.width;
             }
         }
         ball.x += ballVelocity.x * delta;
         ball.y += ballVelocity.y * delta;
 
-        if (ball.x < ball.radius || ball.x > Gdx.graphics.getWidth() - ball.radius) {
-            ballVelocity.x = -ballVelocity.x;
+        if (ball.x <= ball.radius+screen.x) {
+            ballVelocity.x = Math.abs(ballVelocity.x);
+            increaseBallSpeed(1.1f);
+        } else if (ball.x >= screen.x+screen.width - ball.radius)
+        {
+            ballVelocity.x = -Math.abs(ballVelocity.x);
+            increaseBallSpeed(1.1f);
         }
-        if (ball.y > Gdx.graphics.getHeight() - ball.radius) {
-            ballVelocity.y = -ballVelocity.y;
+        if (ball.y >= screen.y+screen.height - ball.radius) {
+            ballVelocity.y = -Math.abs(ballVelocity.y);
+            increaseBallSpeed(1.1f);
         }
 
-        if (ball.y - ball.radius < paddle.y + paddle.height && ball.y - ball.radius > paddle.y) {
-            if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+        if (ball.y - ball.radius <= paddle.y + paddle.height && ball.y - ball.radius >= paddle.y-ball.radius*3) {
+            if (ball.x -ball.radius > paddle.x && ball.x + ball.radius < paddle.x + paddle.width) {
                 ballVelocity.y = -ballVelocity.y;
+                float hitPos = (ball.x - paddle.x)/paddle.width;
+                ballVelocity.rotateDeg((float) (-30*(hitPos-0.5)));
                 ball.y = paddle.y + paddle.height + ball.radius;
+                increaseBallSpeed(1.2f);
                 score++;
             }
         }
-        if (ball.y - ball.radius < paddle.y) {
-            resetBall();
+
+
+
+        if (ball.y - ball.radius < paddle.y- ball.radius*4) {
+            score *= 10;
+            game.eventM.logEvent(ActivityType.STUDY,score);
+            game.screenManager.setScreen(ScreenType.GAME_SCREEN);
+
         }
     }
 
 
-    private void increaseBallSpeed(){
-        float speedFactor = 1.6f;
+
+    private void increaseBallSpeed(float speedFactor){
+        PADDLE_SPEED *= 1 + (speedFactor-1)/4;
         ballVelocity.scl(speedFactor);
         }
 
     private void resetBall(){
         ball.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
-        ballVelocity.set(BALL_SPEED, BALL_SPEED);
+        int downAngle = (int) (90 + 90* Math.random());
+        ballVelocity.set((float) (200*Math.sin(Math.toRadians(downAngle))), (float) (200*Math.sin(Math.toRadians(downAngle))));
     }
     private void draw(){
 

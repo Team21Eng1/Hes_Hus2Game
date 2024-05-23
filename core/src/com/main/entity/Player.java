@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.main.map.GameMap;
 import com.main.Main;
 import com.main.utils.CollisionHandler;
+import com.main.utils.ParticleSys;
 
 import java.util.ArrayList;
 
@@ -24,13 +25,14 @@ public class Player extends Entity implements Disposable {
     GameMap gameMap;
     OrthographicCamera camera;
     public boolean camFollow = true;
-
+    public boolean spaceKey;
     char dir; // Current direction of the player
     public static final float animation_speed = 0.12f; // speed that sprite will animate or frame duration
 
     int tileSize;
 
     public float startX, startY;
+    public double normalizedSpeed;
 
     Texture idleSheet, walkSheet;
 
@@ -39,6 +41,9 @@ public class Player extends Entity implements Disposable {
     public static int spriteX = 15;
     public static int spriteY = 23;
 
+    public ParticleSys PS;
+    private boolean Rot;
+
     /**
      * Constructs a new Player instance.
      *
@@ -46,25 +51,30 @@ public class Player extends Entity implements Disposable {
      * @param gameMap The game map for collision detection and boundaries.
      * @param camera The camera to follow the player.
      */
-    public Player(Main game, GameMap gameMap, OrthographicCamera camera) {
+    public Player(Main game, GameMap gameMap, OrthographicCamera camera,int startX,int startY) {
+        super(startX,startY);
         this.game = game;
         this.gameMap = gameMap;
         this.camera = camera;
+        this.Rot = false;
+
 
 
         tileSize = gameMap.getTileSize();
         this.collisionHandler = new CollisionHandler(gameMap.getMap(), tileSize, tileSize, spriteX,  spriteY *0.5f, 0.7f, 0.7f);
         this.collisionHandler.addCollisionLayers("Trees", "wall_1", "wall_2", "wall_3", "roof_1", "roof_2", "roof_3", "other", "lilipads");
-        //this.settingsScreen = settingsScreen;
 
         this.speed = 200;
-        startX = (float) game.screenWidth /2 - (float) game.screenHeight /2;
-        startY = 500;
+
         worldX = startX;
         worldY = startY;
 
         dir = 'D';
         updateGender();
+        spaceKey = false;
+
+        PS = new ParticleSys(this);
+        setMoving(false);
     }
 
     /**
@@ -73,9 +83,10 @@ public class Player extends Entity implements Disposable {
      * @param delta Time since last frame in seconds.
      */
     public void update(float delta) {
+        PS.update(delta);
 
 
-        boolean isMoving = false;
+        this.isMoving = false;
         currentAnimation.setFrameDuration(animation_speed);
         // Determine if the player is moving diagonally
         boolean isMovingDiagonally = ((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) ||
@@ -83,7 +94,7 @@ public class Player extends Entity implements Disposable {
                 ((Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) ||
                         (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)));
         // Calculate the normalised speed for diagonal movement
-        double normalizedSpeed = speed;
+        normalizedSpeed = speed;
         if (isMovingDiagonally) {
             normalizedSpeed = (speed / Math.sqrt(2)) * 1.07; // Adjust speed for diagonal movement
         }
@@ -100,26 +111,27 @@ public class Player extends Entity implements Disposable {
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             targY = worldY + (float) (normalizedSpeed * Gdx.graphics.getDeltaTime());
             currentAnimation = walkUpAnimation;
-            dir = 'U';
-            isMoving = true;
+            setDir('U');
+
+            setMoving(true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
             targY = worldY - (float) (normalizedSpeed * Gdx.graphics.getDeltaTime());
             currentAnimation = walkDownAnimation;
-            dir = 'D';
-            isMoving = true;
+            setDir('D');
+            setMoving(true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             targX = worldX - (float) (normalizedSpeed * Gdx.graphics.getDeltaTime());
             currentAnimation = walkLeftAnimation;
-            dir = 'L';
-            isMoving = true;
+            setDir('L');
+            setMoving(true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             targX = worldX + (float) (normalizedSpeed * Gdx.graphics.getDeltaTime());
             currentAnimation = walkRightAnimation;
-            dir = 'R';
-            isMoving = true;
+            setDir('R');
+            setMoving(true);
         }
 
         // player doesn't walk beyond the map
@@ -156,6 +168,13 @@ public class Player extends Entity implements Disposable {
 
 
     }
+
+    public void setRot(boolean set)
+    {
+        Rot = set;
+    }
+
+
     public void camUpdate()
     {
 
@@ -262,8 +281,7 @@ public class Player extends Entity implements Disposable {
     }
 
     public void dispose(){
-        idleSheet.dispose();
-        walkSheet.dispose();
+
     }
     @Override
     public int getSpriteX()

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="Github.Hes_Hus2Game.test" target="11" />
+      <module name="Hes_Hus2Game.test" target="11" />
+      <module name="Hes_Hus2Game.Test.main" target="11" />
+      <module name="Hes_Hus2Game.Test.test" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
