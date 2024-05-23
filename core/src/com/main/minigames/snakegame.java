@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -51,6 +52,14 @@ public class snakegame implements Screen {
     private Stage stage;
     private Skin skin;
     private Window popupWindow;
+
+    private long startTime;
+    private float difficultyIncrementInterval = 5.0f; // Increase difficulty every 5 seconds
+    private long lastDifficultyIncrementTime;
+    private Array<Rectangle> apples;
+    private static final int NUM_APPLES = 5;
+    private boolean gameStarted = false;
+
     private Rectangle screen;
     private ShapeRenderer shapeRenderer;
     private static float tileSize = 45;
@@ -62,6 +71,7 @@ public class snakegame implements Screen {
     private OrthographicCamera cam;
 
 
+
     public snakegame (Main game) {
         this.game = game;
     }
@@ -69,8 +79,11 @@ public class snakegame implements Screen {
     @Override
     public void show() {
         customFont = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
+
+
         batch = game.batch;
         shapeRenderer = new ShapeRenderer();
+
 
 
 
@@ -79,6 +92,20 @@ public class snakegame implements Screen {
         headTexture = new Texture("snakegame/head_right.png");
         bodyTexture = new Texture("snakegame/body_horizontal.png");
         appleTexture = new Texture("snakegame/apple.png");
+
+        snake =new Array<>();
+        initializeSnake();
+        apples = new Array<>();
+        placeApples();
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
+        setupPopup();
+        startTime = TimeUtils.millis();
+        lastDifficultyIncrementTime = startTime;
+    
+
+    
+
         screen = new Rectangle(0,0,tileSize*9,tileSize*16);
         snake =new Array<>();
         initializeSnake();
@@ -102,6 +129,28 @@ public class snakegame implements Screen {
         timer = 0.1f;
         t=0;
     }
+    private void placeApples() {
+        apples.clear();
+        for (int i = 0; i < NUM_APPLES; i++) {
+            Rectangle apple = new Rectangle();
+            boolean placed = false;
+            while (!placed) {
+                int newX = MathUtils.random(0, Gdx.graphics.getWidth() / 20 - 1) * 20;
+                int newY = MathUtils.random(0, Gdx.graphics.getHeight() / 20 - 1) * 20;
+                apple.set(newX, newY, 20, 20);
+                placed = true;
+                for (Rectangle segment : snake) {
+                    if (segment.overlaps(apple)) {
+                        placed = false;
+                        break;
+                    }
+                }
+            }
+            apples.add(apple);
+        
+        }
+    }
+
     private void initializeSnake(){
         snake.clear();
         snake.add(new Rectangle(screen.x + 4*tileSize, screen.y + 5*tileSize,tileSize,tileSize));
@@ -110,7 +159,7 @@ public class snakegame implements Screen {
     }
 
 
-    private void setupPopup(){
+    private void setupPopup() {
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(new Texture("mini_games/howtoplay.png")));
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = customFont;
@@ -120,48 +169,59 @@ public class snakegame implements Screen {
         popupWindow = new Window("HOW TO PLAY", windowStyle);
         popupWindow.getTitleLabel().setAlignment(Align.center);
         popupWindow.setSize(350, 350);
-        popupWindow.setPosition(game.screenWidth / 2 - 200, game.screenHeight / 2 - 200);
+        popupWindow.setPosition(Gdx.graphics.getWidth() / 2 - 175, Gdx.graphics.getHeight() / 2 - 175);
+
         popupWindow.align(Align.center);
         popupWindow.setModal(true);
         popupWindow.setVisible(true);
 
-        Label instructions = new Label("Use arrow keys to control the snake. Try to eat as many apples as possible without hitting yourself.  " +
-                "CLick to continue.", new Label.LabelStyle(customFont, Color.WHITE));
+        Label instructions = new Label("Use arrow keys to control the snake. Try to eat as many apples as possible in 25 seconds. " +
+                "Click to continue.", new Label.LabelStyle(customFont, Color.WHITE));
         instructions.setWrap(true);
         instructions.setAlignment(Align.center);
 
         popupWindow.add(instructions).expand().fill().center().width(280).pad(10);
-        popupWindow.row();
-
         popupWindow.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                gameStarted = true;
+                startTime = TimeUtils.millis(); // Reset the start time when the game starts
                 popupWindow.remove();
             }
         });
         stage.addActor(popupWindow);
-
-        Timer.schedule(new Timer.Task(){
-            @Override
-            public void run() {
-                popupWindow.remove();
-            }
-        }, 5);
     }
-
-
-
     @Override
     public void render(float delta) {
-        handleInput();
+
+        if (gameStarted) {
+            handleInput();
+            if (System.currentTimeMillis() - lastUpdateTime > moveTime * 1000) {
+                moveSnake();
+                lastUpdateTime = System.currentTimeMillis();
+            }
+
+            float elapsedTime = (TimeUtils.millis() - startTime) / 1000.0f;
+            if (elapsedTime > 25) {
+                game.setScreen(new MainGameScreen(game));
+            }
+
+            if (elapsedTime - (lastDifficultyIncrementTime / 1000.0f) > difficultyIncrementInterval) {
+                moveTime *= 0.9; // Increase speed by reducing moveTime by 10%
+                lastDifficultyIncrementTime = TimeUtils.millis(); // Reset the difficulty increment timer
+            }
+
+            handleInput();
 
 
-        foreground.stateTime+=delta;
-        t+=delta;
+            foreground.stateTime+=delta;
+            t+=delta;
 
-        if (t>timer) {
-            moveSnake();
-            t=0;
+            if (t>timer) {
+                moveSnake();
+                t=0;
+
+            }
         }
 
 
@@ -200,11 +260,24 @@ public class snakegame implements Screen {
             Texture texture = getSnakeTexture(i);
             batch.draw(texture, snake.get(i).x, snake.get(i).y,tileSize,tileSize);
         }
+
+        for (Rectangle apple : apples) {
+            batch.draw(appleTexture, apple.x, apple.y);
+        }
+        customFont.draw(batch, "Score:" + score, 10, Gdx.graphics.getHeight() - 10);
+
         batch.draw(appleTexture, apple.x, apple.y,tileSize,tileSize);
         customFont.draw(batch, "Score:" + score, 10, game.screenHeight - 10);
+
         customFont.draw(batch, "Use arrow keys to move the snake",
                 game.screenWidth - 400, game.screenHeight - 10);
 
+        if (gameStarted) {
+            float elapsedTime = (TimeUtils.millis() - startTime) / 1000.0f;
+            customFont.draw(batch, "Time: " + (30 - (int) elapsedTime), Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() - 10);
+        } else {
+            customFont.draw(batch, "Time: 25", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() - 10);
+        }
         batch.end();
         game.batch.setProjectionMatrix(game.defaultCamera.combined);
         batch.begin();
@@ -213,8 +286,10 @@ public class snakegame implements Screen {
 
 
 
-    }
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
 
+    }
     private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && snakeDirection != Input.Keys.RIGHT) {
             snakeDirection = Input.Keys.LEFT;
@@ -231,6 +306,7 @@ public class snakegame implements Screen {
         }
 
     }
+
 
     public Texture getSnakeTexture(int snakeIndex)
     {
@@ -289,6 +365,7 @@ public class snakegame implements Screen {
     }
 
 
+
     public void moveSnake() {
         Rectangle head = new Rectangle(snake.first().x, snake.first().y, tileSize, tileSize);
         switch (snakeDirection) {
@@ -316,14 +393,24 @@ public class snakegame implements Screen {
         } else {
             snake.insert(0, head);
 
-            if (head.overlaps(apple)) {
-                score += 10;
-                placeApple();
-            } else {
+            boolean ateApple = false;
+            for (int i = 0; i < apples.size; i++) {
+                if (head.overlaps(apples.get(i))) {
+                    score += 10;
+                    apples.removeIndex(i);
+                    ateApple = true;
+                    break;
+                }
+            }
+            if (!ateApple) {
                 snake.pop();
+            }
+            if (apples.size == 0) {
+                placeApples();
             }
         }
     }
+
     private boolean checkCollision(Rectangle head){
         for (int i = 1; i < snake.size; i++) {
             if (head.overlaps(snake.get(i))) {
@@ -332,6 +419,7 @@ public class snakegame implements Screen {
         }
         return false;
     }
+
 
     private void placeApple() {
         if (apple == null) {
@@ -354,6 +442,7 @@ public class snakegame implements Screen {
             }
         }
     }
+
 
     @Override
     public void resize(int width, int height) {
