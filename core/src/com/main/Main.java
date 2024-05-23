@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import static com.badlogic.gdx.Gdx.graphics;
 
 import com.main.utils.AudioManager;
+import com.main.utils.EventManager;
 import com.main.utils.ScreenManager;
 import com.main.utils.ScreenType;
 
@@ -20,6 +21,7 @@ import com.main.utils.ScreenType;
 public class Main extends Game {
 	public SpriteBatch batch; // Used for drawing textures and sprites in batchesw
 	public AudioManager audio;
+	public EventManager eventM;
 	public ScreenManager screenManager; // Manages the game's screens, allowing for easy transitions
 	public int screenWidth, screenHeight; // The current width and height of the screen
 	public int defWidth, defHeight; // Default screen width and height, used for UI scaling
@@ -28,7 +30,9 @@ public class Main extends Game {
 	public float scaleFactorX;
 	public float scaleFactorY;
 
-    /**
+	public BitmapFont font;
+
+	/**
 	 * Called when the game is first created.
 	 * Initializes the game's main components and sets the main menu as the initial screen.
 	 */
@@ -36,6 +40,7 @@ public class Main extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		audio = new AudioManager();
+		eventM = new EventManager();
 		screenWidth = graphics.getWidth();
 		screenHeight = graphics.getHeight();
 
@@ -50,7 +55,7 @@ public class Main extends Game {
 
 		// Fonts for writing in game
 		skin = new Skin();
-		BitmapFont font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
+		font = new BitmapFont(Gdx.files.internal("font/WhitePeaberry.fnt"));
 		skin.add("default-font", font, BitmapFont.class);
 		Label.LabelStyle labelStyle = new Label.LabelStyle();
 		labelStyle.font = font;

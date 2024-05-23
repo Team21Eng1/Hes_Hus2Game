@@ -1,4 +1,4 @@
-package com.main.screens;
+package com.main.minigames;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.main.Main;
+import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -91,8 +92,9 @@ public class TypingGame implements Screen, InputProcessor {
         displayCorrect = false;
         if (attempts < studyDuration){
             currentNumber = generateNumber();
-            delay(5, this::makeUserGuess);
+            delay(3, this::makeUserGuess);
         } else {
+            game.eventM.logEvent(ActivityType.STUDY,correct*100);
             game.screenManager.setScreen(ScreenType.GAME_SCREEN);
         }
     }
