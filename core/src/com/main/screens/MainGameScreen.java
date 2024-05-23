@@ -401,7 +401,6 @@ public class MainGameScreen implements Screen, InputProcessor {
      */
     @Override
     public boolean touchDown(int touchX, int touchY, int pointer, int button){
-        //gui.popup.showing=true;
 
         Vector2 mouse = new Vector2(touchX,game.screenHeight - touchY);
         if (gui.menuButton.overlap(mouse,zoom)) {

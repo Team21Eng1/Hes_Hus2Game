@@ -208,12 +208,11 @@ public class Pong implements Screen {
         if (timeRemaining <= 0) {
             gameOver = true;
             gameOverTimer = GAME_OVER_PAUSE;
-            game.setScreen(new MainGameScreen(game));
             return;
         }
         timeElapsed += delta;
         if (timeElapsed >= increasedInterval) {
-            increaseBallSpeed();
+            increaseBallSpeed(1.1f);
             timeElapsed = 0;
         }
 

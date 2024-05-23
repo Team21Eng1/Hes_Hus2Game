@@ -55,8 +55,9 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         this.cam = new OrthographicCamera();
         this.cam.setToOrtho(false, this.game.screenWidth, this.game.screenHeight);
         this.cam.rotate(new Vector3(0,0,1),8.5f);
-
+        achmnts = new ArrayList<>();
         if (game.eventM.curDay == 8) {
+            achmnts = game.eventM.checkForAchievements();
             inputName = true;
             backButton = new Button(new Texture("settings_gui/back_button.png"),game.screenWidth/2 - 200,game.screenHeight/8,5);
             backButton.Centre();
@@ -70,13 +71,7 @@ public class LeaderboardScreen implements Screen, InputProcessor {
         }
         Achieve = new Button(new Texture("counter_big.png"),0,0,4);
 
-        achmnts = game.eventM.checkForAchievements();
 
-        achmnts.add(AchievementType.BRAWN);
-        achmnts.add(AchievementType.NERD);
-        achmnts.add(AchievementType.TEACHPET);
-        achmnts.add(AchievementType.GLUTTON);
-        achmnts.add(AchievementType.ROUGH_SLEEPER);
 
         if (achmnts.size() == 0) {AchievmentText = new TextBox("ACHIEVEMENTS:\nYour achievments will appear here at the end of the game!",Achieve.x+4,Achieve.y+Achieve.height,Achieve.width,20,font);}
         else {AchievmentText = new TextBox("ACHIEVEMENTS:",Achieve.x+4,Achieve.y+Achieve.height,Achieve.width,20,font);

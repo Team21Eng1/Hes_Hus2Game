@@ -36,8 +36,8 @@ public class GUI {
     {
         counterBackground = new Button(new Texture("counter_background.png"),(int) ((game.screenWidth)/zoom), (int) ((game.screenHeight)/zoom),1.2f);
         counterBackground.pad(6,5,7,5); counterBackground.Right(); counterBackground.Top();
-        counterBig = new Button(new Texture("counter_big.png"), (int) ((game.screenWidth)/zoom),30,1);
-        counterBig.pad(6,7,7,5); counterBig.Right();
+//        counterBig = new Button(new Texture("counter_big.png"), (int) ((game.screenWidth)/zoom),30,1);
+//        counterBig.pad(6,7,7,5); counterBig.Right();
         menuButton = new Button(new Texture("menu_buttons/menu_icon.png"),0, (int) ((game.screenHeight)/zoom),2);
         menuButton.pad(6,2,7,5);
         menuButton.Top();
@@ -47,13 +47,14 @@ public class GUI {
         energyFill = new Slider(energyBarClear.x, energyBarClear.y, energyBarClear.width, energyBarClear.height, energyBarClear.scale, Color.GREEN);
         energyFill.setFill(50);
         timeText = new TextBox("text",counterBackground.x, counterBackground.y+counterBackground.height+3,counterBackground.width, counterBackground.height, game.font);
-        sideText = new TextBox("text",counterBig.x+4, counterBig.y+counterBig.height,counterBig.width-8, counterBig.height-4, game.font);
+        sideText = new TextBox("text",counterBackground.x-70, counterBackground.y+counterBackground.height+3,counterBackground.width, counterBackground.height, game.font);
         sideText.align = Align.topLeft;
 
 
         sleep = new SleepPopup((int) ((game.screenWidth/2)/zoom), (int) ((game.screenHeight/2)/zoom), 3,game.font);
         energyP = new EnergyPopup((int) ((game.screenWidth/2)/zoom), (int) ((game.screenHeight/2)/zoom), 3,game.font);
         popup = energyP;
+        popup.showing=false;
 
         durationPopupMenu = new DurationPopup((int) ((game.screenWidth/2)/zoom), (int) ((game.screenHeight/2)/zoom), 3,game.font);
     }
@@ -65,7 +66,6 @@ public class GUI {
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
         counterBackground.render(batch);
-        counterBig.render(batch);
 
         menuButton.render(batch);
 
@@ -84,8 +84,7 @@ public class GUI {
     {
         popup.update(delta);
         timeText.text = game.eventM.hours + ":" +game.eventM.mins;
-        sideText.text = "Day: " + game.eventM.curDay +"\n"
-         + "current: heheha";
+        sideText.text = "Day: " + game.eventM.curDay;
     }
 
 }

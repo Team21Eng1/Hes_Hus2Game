@@ -18,6 +18,10 @@ import com.main.gui.TextBox;
 import com.main.utils.ActivityType;
 import com.main.utils.ScreenType;
 
+/**
+ * Gym Mini Game Class implemented for assessment 2. Uses the newly created GUI Package to add an animated
+ */
+
 public class GymMini implements Screen, InputProcessor {
     Main game;
     int duration;
@@ -39,9 +43,11 @@ public class GymMini implements Screen, InputProcessor {
 
     public GymMini(Main game, int Duration){
         this.game = game;
-        this.ArmTex = new Texture("gymmini/ArmSheet.png");
+
         this.duration = Duration;
         this.arm = new Entity((int) (game.screenWidth/2f), (int) (game.screenHeight /2.5f) - 100);
+
+        this.ArmTex = new Texture("gymmini/ArmSheet.png");
         this.bicep = new Animation(1f, (Object[]) arm.getFrames(ArmTex, 0, 3, 0, 64, 128, false));
         this.arm.currentAnimation = this.bicep;
         this.scale = 4f;
@@ -62,6 +68,10 @@ public class GymMini implements Screen, InputProcessor {
 
     }
 
+    /**
+     * render update renders the gui elements and updates the timer for the minigame
+     * @param delta
+     */
     @Override
     public void render(float delta) {
 

@@ -3,6 +3,9 @@ package com.main.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
+/**
+ * NEW AudioManager Class combines previous teams Music and Sound classes into one which can be accessed through the Main game class
+ */
 public class AudioManager {
 
     private Music bgMusic,upSound,downSound;
@@ -14,13 +17,14 @@ public class AudioManager {
     private final float musicCap = 0.1f;
     /**
      * Constructor for GameMusic. Initializes and starts playing the game's background music at the maximum volume level.
+     *
      */
     public AudioManager() {
 
         //music
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("music_loop/Ludum Dare 30 - 01.ogg"));
         bgMusic.play();
-        bgMusic.setVolume(musicCap); // Set volume to 100%
+        bgMusic.setVolume(musicCap); // Set volume to 10%
         bgMusic.setLooping(true);
 
         //sound effects
